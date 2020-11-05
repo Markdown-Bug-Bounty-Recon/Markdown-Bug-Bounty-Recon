@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -xv
 
 usage(){
 
@@ -11,67 +11,270 @@ usage(){
 
 }
 
-while getopts d: OPTION
-do
+#while getopts d: OPTION do
+#	case $OPTION in
+#		domain)
+#		domain="$OPTARG"
+#		;;
+#		ASN)
+#		ASN="$OPTARG"
+#		;;
+#		?)
+#		usage
+#		;;
+#	esac
+#done
+
+while getopts d: OPTION; do
 	case $OPTION in
 		d)
 		domain="$OPTARG"
 		;;
 		a)
 		ASN="$OPTARG"
+		;;
 		?)
 		usage
 		;;
 	esac
 done
 
-initialization.sh
+dirsearchWordlist=~/tools/dirsearch/db/dicc.txt
+massdnsWordlist=~/tools/SecLists/Discovery/DNS/clean-jhaddix-dns.txt
+
+mkdir ${domain}
+if [ -f "./${domain}/Acquisitions.txt" ];then
+	echo "There's already text file for Acquisitions"
+else
+	touch ./${domain}/Acquisitions.txt
+fi
+
 ## Acquisitions
 
 
 
-#while read p 
-#do
+#while read p; do
 
-#done < Acquisitions
+#done Acquisitions
 
 
-mkdir command_output
-dir=$PWD/command_output 
-bin=$PWD/command_output/bin
+
+mkdir -p ./${domain}/bin
+dir=$PWD/${domain}
+bin=$dir/bin
 ## ASN Enumeration
-amass intel --asn $ASN -o $bin/roots.txt
+if [ $ASN -z ]; then
+	echo 'You did not supplied ASN number'
+	touch $bin/roots.txt # Making empty file
+	echo "${domain}" >> $bin/roots.txt
+
+else
+
+	amass intel --asn $ASN -o $bin/roots.txt
+fi
+
 
 # HERE'S THE PLACE FOR 'WHILE' STATEMENT
+while read domain; do
+	mkdir $bin/${domain}
+	bin=$dir/bin/${domain}
+	## Wappalyzer / Listing Technologies
+	https_link=$(echo ${domain} | httprobe)
+	node ~/tools/wappalyzer/src/drivers/npm/cli.js $https_link -P | jq '.technologies[].name' | tee $bin/${domain}_technologies.txt
 
-## Wappalyzer / Listing Technologies
-node ~/tools/wappalyzer/src/drivers/npm/cli.js $domain -P | jq '.technologies[].name' | tee $bin/${domain}_technologies.txt
+	## Crawling the website with hakrawler to find new roots, subdomain and javascript files
 
-## Crawling the website with hakrawler to find new roots, subdomain and javascript files
+	hakrawler -url ${domain} -depth 2 -js -plain | tee $bin/${domain}_javascript_files.txt
 
-hakrawler -url $domain -depth 1 -js -plain | tee $bin/${domain}_javascript_files.txt
-hakrawler -url tesla.com -depth 1 -subs -usewayback -plain | tee -a $bin/${domain}_subdomains.txt
-## Analyzing Javascript with SubDomainizer and subscraper
-
-SubDomainizer.py -l ${domain}_javascript_files.txt -o $/bin/${domain}_subdomains_domainizer.txt
-uniq -u $bin/${domain}_subdomains_subdomainizer.txt  $bin/${domain}_subdomains.txt | tee -a $bin/${domain}_subdomains.txt
+	hakrawler -url ${domain} -depth 1 -subs -usewayback -plain | tee -a $bin/${domain}_subdomains.txt
+	sed -i 's/www.//' $bin/${domain}_subdomains.txt # Some of the output from hakrawler begin with 'www.' to make this output uniform we're using sed on it 
 
 
-# Subdomain Scraping
-amass enum -d $domain -o $bin/${domain}_subdomain_amass.txt
-uniq -u $bin/${domain}_subdomains_amass.txt  $bin/${domain}_subdomains.txt | tee -a $bin/{domain}_subdomains.txt
-rm $bin/${domain}_subdomains_amass.txt
+	## Analyzing Javascript with SubDomainizer and subscraper
 
-subfinder -d $domain -o $bin/${domain}_subdomains_subfinder.txt
-uniq -u $bin/${domain}_subdomains_subfinder.txt  $bin/${domain}_subdomains.txt | tee -a $bin/${domain}_subdomains.txt
-rm $bin/${domain}_subdomains_subfinder.txt
+	SubDomainizer.py -l $bin/${domain}_javascript_files.txt -o $bin/${domain}_subdomains_subdomainizer.txt
+	uniq -u $bin/${domain}_subdomains.txt $bin/${domain}_subdomains_subdomainizer.txt | tee -a $bin/${domain}_subdomains.txt
 
-## From cloud ranges
-curl 'https://tls.bufferover.run/dns?q=.defcon.org' 2>/dev/null | jq .Results | cut -d ',' -f 3 | tr -d '\"' | tr -d ']' | tr -d '[' | tee $bin/${domain}_subdomains_cloud.txt # YES I KNOW THAT THESE 'TR' LOOK TERRIBLE, WILL CHANGE IT TO SED SOMEDAY OR GREP
-uniq -u $bin/${domain}_subdomains_cloud.txt  $bin/${domain}_subdomains.txt | tee -a $bin/${domain}_subdomains.txt
-rm $bin/${domain}_subdomains_cloud.txt
-#github-subdomains.py -d $domain -o $bin/{domain}_subdomain_github.txt
 
-# Checking if these subdomains are alive
+	# Subdomain Scraping
+	amass enum -d ${domain} -o $bin/${domain}_subdomains_amass.txt
+	uniq -u $bin/${domain}_subdomains.txt $bin/${domain}_subdomains_amass.txt   | tee -a $bin/${domain}_subdomains.txt
+	rm $bin/${domain}_subdomains_amass.txt
 
-cat $bin/${domain}_subdomains.txt | httprobe | tee $bin/${domain}_alive_subdomains.txt
+	subfinder -d ${domain} -o $bin/${domain}_subdomains_subfinder.txt
+	uniq -u $bin/${domain}_subdomains.txt $bin/${domain}_subdomains_subfinder.txt | tee -a $bin/${domain}_subdomains.txt
+	rm $bin/${domain}_subdomains_subfinder.txt
+
+	## From cloud ranges
+	curl 'https://tls.bufferover.run/dns?q=.${domain}' 2>/dev/null | jq .Results | cut -d ',' -f 3 | tr -d '\"' | tr -d ']' | tr -d '[' | tee -a $bin/${domain}_subdomains_cloud.txt # YES I KNOW THAT THESE 'TR' LOOK TERRIBLE, WILL CHANGE IT TO SED SOMEDAY OR GREP
+	uniq -u  $bin/${domain}_subdomains.txt $bin/${domain}_subdomains_cloud.txt | tee -a $bin/${domain}_subdomains.txt
+	rm $bin/${domain}_subdomains_cloud.txt
+	#github-subdomains.py -d ${domain} -o $bin/{domain}_subdomain_github.txt
+
+	# Checking if these subdomains are alive
+
+	cat $bin/${domain}_subdomains.txt | httprobe | tee -a $bin/${domain}_alive_subdomains.txt
+
+
+	# Another while loop here for subdomains bruting
+	#while read subdomain;
+	#do
+		#amass enum -brute -d ${subdomain} -src -o $bin/${domain}_subdomain_bruting_amass.txt
+
+	#done < $bin/${domain}_alive_subdomains.txt
+
+	uniq -u $bin/${domain}_subdomains.txt $bin/${domain}_subdomain_bruting_amass.txt | tee -a $bin/${domain}_subdomains.txt
+
+	cat $bin/${domain}_subdomains.txt | httprobe | tee -a $bin/${domain}_alive_subdomains.txt
+
+	#Small script to compare ${domain}_subdomains with alive to delete all alive lines that are in subdomains and pipe it to ${domain}_not_alive_subdomains.txt
+
+	cat $bin/${domain}_alive_subdomains.txt | tr -d "/" | cut -d ":" -f 2 > $bin/${domain}_alive_subdomains_without_protocol.txt
+	grep -v -x $bin/${domain}_alive_subdomains_without_protocol.txt $bin/${domain}_subdomains.txt | tee $bin/${domain}_subdomains.txt
+	rm $bin/${domain}_alive_subdomains_without_protocol.txt
+
+	# Favfreak
+	cat $bin/${domain}_alive_subdomains.txt | favfreak.py -o $bin/${domain}_favfreak
+	# Port scanning with not alive hosts
+
+	while read subdomain; do 
+		mkdir $bin/not_alive_${subdomain}
+		#dnmasscan ${subdomain} -oG "$bin/not_alive_${subdomain}/${subdomain}_masscan.log"
+
+		# NMAP SCAN WITH -oG flag output
+
+		# ----------------
+		#brutespray -f $bin/not_alive_${subdomain}/${domain}_${subdomain}_nmap.txt -o $bin/not_alive_${subdomain}/${domain}_${subdomain}_brutespray
+		
+
+		# Cleaning directories that are empty
+		#if [ "$(ls -A $bin/not_alive_${subdomain}/${domain}_${subdomain}_brutespray)" ];
+		#then
+		#	echo ''
+		#else
+		#	rm -rf $bin/not_alive_${subdomain}/${domain}_${subdomain}_brutespray
+		#fi
+
+		#if [ "$(ls -A $bin/not_alive_${subdomain})" ];
+		#then
+		#	echo ''
+		#else
+		#	rm -rf $bin/not_alive_${subdomain}
+		#fi
+
+
+	done < $bin/${domain}_subdomains.txt;
+
+
+	while read alive_subdomain; do
+		
+		alive_subdomain_folder_name=$(echo $alive_subdomain | tr -d "/" | cut -d ":" -f 2) # Because in creation of directories, the '/' letter is not escaped we need to cut out only domain.com and get rid of 'https://''
+		
+		mkdir $bin/alive_${alive_subdomain_folder_name}
+		mkdir $bin/alive_${alive_subdomain_folder_name}/${alive_subdomain_folder_name}_nuclei_op
+
+		nuclei -target $alive_subdomain -t "/home/penelope/tools/nuclei-templates/cves/*.yaml" -c 60 -o  $bin/alive_${alive_subdomain_folder_name}/${alive_subdomain_folder_name}_nuclei_op/cves.txt
+		nuclei -target $alive_subdomain -t "/home/penelope/tools/nuclei-templates/files/*.yaml" -c 60 -o  $bin/alive_${alive_subdomain_folder_name}/${alive_subdomain_folder_name}_nuclei_op/files.txt
+		nuclei -target $alive_subdomain -t "/home/penelope/tools/nuclei-templates/panels/*.yaml" -c 60 -o  $bin/alive_${alive_subdomain_folder_name}/${alive_subdomain_folder_name}_nuclei_op/panels.txt
+		nuclei -target $alive_subdomain -t "/home/penelope/tools/nuclei-templates/security-misconfiguration/*.yaml" -c 60 -o  $bin/alive_${alive_subdomain_folder_name}/${alive_subdomain_folder_name}_nuclei_op/security-misconfiguration.txt
+		nuclei -target $alive_subdomain -t "/home/penelope/tools/nuclei-templates/technologies/*.yaml" -c 60 -o  $bin/alive_${alive_subdomain_folder_name}/${alive_subdomain_folder_name}_nuclei_op/technologies.txt
+		nuclei -target $alive_subdomain -t "/home/penelope/tools/nuclei-templates/tokens/*.yaml" -c 60 -o  $bin/alive_${alive_subdomain_folder_name}/${alive_subdomain_folder_name}_nuclei_op/tokens.txt
+		nuclei -target $alive_subdomain -t "/home/penelope/tools/nuclei-templates/vulnerabilities/*.yaml" -c 60 -o  $bin/alive_${alive_subdomain_folder_name}/${alive_subdomain_folder_name}_nuclei_op/vulnerabilities.txt
+
+		# Cleaning directories that are empty
+		#if [ "$(ls -A $bin)" ];
+		#then
+		#	echo ''
+		#else
+		#	rm -rf $bin/
+		#fi
+
+		#if [ "$(ls -A $bin/../)" ];
+		#then
+		#	echo ''
+		#else
+		#	rm -rf $bin/../
+		#fi
+
+	done < $bin/${domain}_alive_subdomains.txt;
+	
+	# Javascript work
+
+	mkdir -p $bin/javascript_work/scripts
+	mkdir -p $bin/javascript_work/scriptsresponse
+	mkdir -p $bin/javascript_work/endpoints
+	mkdir -p $bin/javascript_work/responsebody
+	mkdir -p $bin/javascript_work/headers
+
+	jsep()
+{
+		response(){
+		echo "Gathering Response"       
+		        for x in $(cat $bin/${domain}_alive_subdomains.txt); do
+		        NAME=$(echo $x | awk -F/ '{print $3}')
+		        curl -X GET -H "X-Forwarded-For: evil.com" $x -I | tee -a "$bin/javascript_work/headers/$NAME" 
+		        curl -s -X GET -H "X-Forwarded-For: evil.com" -L $x |tee -a "$bin/javascript_work/responsebody/$NAME"
+		done
+		}
+
+		jsfinder(){
+		echo "Gathering JS Files"       
+		for x in $(ls "$bin/javascript_work/responsebody"); do
+		        printf "\n\n${RED}$x${NC}\n\n"
+		        END_POINTS=$(cat "$bin/javascript_work/responsebody/$x" | grep -Eoi "src=\"[^>]+></script>" | cut -d '"' -f 2)
+		        for end_point in $END_POINTS; do
+		                len=$(echo $end_point | grep "http" | wc -c)
+		                mkdir "$bin/javascript_work/scriptsresponse/$x/" > /dev/null 2>&1
+		                URL=$end_point
+		                if [ $len == 0 ]
+		                then
+		                        URL="https://$x$end_point"
+		                fi
+		                file=$(basename $end_point)
+		                curl -X GET $URL -L > "$bin/javascript_work/scriptsresponse/$x/$file"
+		                echo $URL | tee -a "$bin/javascript_work/scripts/$x"
+		        done
+		done
+		}
+
+		endpoints()
+		{
+		echo "Gathering Endpoints"
+		for domain in $(ls $bin/javascript_work/scriptsresponse); do
+		        #looping through files in each domain
+		        mkdir $bin/javascript_work/endpoints/${domain}
+		        for file in $(ls $bin/javascript_work/scriptsresponse/${domain}); do
+		                ruby ~/tools/relative-url-extractor/extract.rb $bin/javascript_work/scriptsresponse/${domain}/$file | tee -a endpoints/${domain}/$file 
+		        done
+		done
+
+		}
+		response
+		jsfinder
+		endpoints
+		}
+	#jsep
+
+	#dir=$PWD/${domain}
+	#bin=$dir/bin
+	
+	# Aquatone
+	mkdir $dir/aquatone
+	cat $bin/${domain}_alive_subdomains.txt | aquatone -out $dir/bin/aquatone
+
+	#Cleaning
+
+	#Markdown conversion begins here:
+
+	mkdir $bin/markdown
+	markdown_dir=$bin/markdown
+	cp $bin/${domain}_alive_subdomains.txt $markdown_dir
+	cp $bin/${domain}_subdomains.txt $markdown_dir	
+	cp $bin/${domain}_technologies.txt $markdown_dir	
+
+
+dir=$PWD/${domain}
+bin=$dir/bin
+done < $bin/roots.txt
+
+
