@@ -110,7 +110,6 @@ for domain in $(cat ${bin}/roots.txt); do
 	uniq -u  $bin/${domain}_subdomains.txt $bin/${domain}_subdomains_cloud.txt | tee -a $bin/${domain}_subdomains.txt
 	rm $bin/${domain}_subdomains_cloud.txt
 	#github-subdomains.py -d ${domain} -o $bin/{domain}_subdomain_github.txt
-
 	# Checking if these subdomains are alive
 
 	cat $bin/${domain}_subdomains.txt | httprobe | tee -a $bin/${domain}_alive_subdomains.txt
@@ -124,6 +123,8 @@ for domain in $(cat ${bin}/roots.txt); do
 	#done < $bin/${domain}_alive_subdomains.txt
 
 	uniq -u $bin/${domain}_subdomains.txt $bin/${domain}_subdomain_bruting_amass.txt | tee -a $bin/${domain}_subdomains.txt
+
+	cat $bin/${domain}_subdomains.txt | sort | uniq -u | tee $bin/${domain}_subdomains.txt
 
 	cat $bin/${domain}_subdomains.txt | httprobe | tee -a $bin/${domain}_alive_subdomains.txt
 
@@ -168,7 +169,7 @@ for domain in $(cat ${bin}/roots.txt); do
 
 	for alive_subdomain in $(cat ${bin}/${domain}_alive_subdomains.txt); do
 		
-		alive_subdomain_folder_name=$(echo ${alive_subdomain} | tr -d "/" | cut -d ":" -f 2) # Because in creation of directories, the '/' letter is not escaped we need to cut out only domain.com and get rid of 'https://''
+		alive_subdomain_folder_name=$(echo ${alive_subdomain} | tr -d "/" "_") # Because in creation of directories, the '/' letter is not escaped we need to cut out only domain.com and get rid of 'https://''
 		
 		mkdir ${bin}/alive_${alive_subdomain_folder_name}
 		mkdir ${bin}/alive_${alive_subdomain_folder_name}/${alive_subdomain_folder_name}_nuclei_op
@@ -222,21 +223,10 @@ for domain in $(cat ${bin}/roots.txt); do
 		done
 		}
 
-		endpoints()
-		{
-		echo "Gathering Endpoints"
-		for domain in $(ls ${bin}/javascript_work/scriptsresponse); do
-		        #looping through files in each domain
-		        mkdir ${bin}/javascript_work/endpoints/${domain}
-		        for file in $(ls ${bin}/javascript_work/scriptsresponse/${domain}); do
-		                ruby ~/tools/relative-url-extractor/extract.rb ${bin}/javascript_work/scriptsresponse/${domain}/$file | tee -a endpoints/${domain}/$file 
-		        done
-		done
 
 		}
 		response
 		jsfinder
-		endpoints
 		}
 	jsep
 
