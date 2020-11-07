@@ -75,7 +75,7 @@ fi
 
 
 # HERE'S THE PLACE FOR 'WHILE' STATEMENT
-while read domain; do
+for domain in $(cat ${bin}/roots.txt); do
 	mkdir $bin/${domain}
 	bin=$dir/bin/${domain}
 	## Wappalyzer / Listing Technologies
@@ -137,7 +137,7 @@ while read domain; do
 	cat $bin/${domain}_alive_subdomains.txt | favfreak.py -o $bin/${domain}_favfreak
 	# Port scanning with not alive hosts
 
-	while read subdomain; do 
+	for subdomain in $(cat ${bin}/${domain}_subdomains.txt); do
 		mkdir $bin/not_alive_${subdomain}
 		#dnmasscan ${subdomain} -oG "$bin/not_alive_${subdomain}/${subdomain}_masscan.log"
 
@@ -163,76 +163,61 @@ while read domain; do
 		#fi
 
 
-	done < $bin/${domain}_subdomains.txt;
+	done
 
 
-	while read alive_subdomain; do
+	for alive_subdomain in $(cat ${bin}/${domain}_alive_subdomains.txt); do
 		
-		alive_subdomain_folder_name=$(echo $alive_subdomain | tr -d "/" | cut -d ":" -f 2) # Because in creation of directories, the '/' letter is not escaped we need to cut out only domain.com and get rid of 'https://''
+		alive_subdomain_folder_name=$(echo ${alive_subdomain} | tr -d "/" | cut -d ":" -f 2) # Because in creation of directories, the '/' letter is not escaped we need to cut out only domain.com and get rid of 'https://''
 		
-		mkdir $bin/alive_${alive_subdomain_folder_name}
-		mkdir $bin/alive_${alive_subdomain_folder_name}/${alive_subdomain_folder_name}_nuclei_op
+		mkdir ${bin}/alive_${alive_subdomain_folder_name}
+		mkdir ${bin}/alive_${alive_subdomain_folder_name}/${alive_subdomain_folder_name}_nuclei_op
 
-		nuclei -target $alive_subdomain -t "/home/penelope/tools/nuclei-templates/cves/*.yaml" -c 60 -o  $bin/alive_${alive_subdomain_folder_name}/${alive_subdomain_folder_name}_nuclei_op/cves.txt
-		nuclei -target $alive_subdomain -t "/home/penelope/tools/nuclei-templates/files/*.yaml" -c 60 -o  $bin/alive_${alive_subdomain_folder_name}/${alive_subdomain_folder_name}_nuclei_op/files.txt
-		nuclei -target $alive_subdomain -t "/home/penelope/tools/nuclei-templates/panels/*.yaml" -c 60 -o  $bin/alive_${alive_subdomain_folder_name}/${alive_subdomain_folder_name}_nuclei_op/panels.txt
-		nuclei -target $alive_subdomain -t "/home/penelope/tools/nuclei-templates/security-misconfiguration/*.yaml" -c 60 -o  $bin/alive_${alive_subdomain_folder_name}/${alive_subdomain_folder_name}_nuclei_op/security-misconfiguration.txt
-		nuclei -target $alive_subdomain -t "/home/penelope/tools/nuclei-templates/technologies/*.yaml" -c 60 -o  $bin/alive_${alive_subdomain_folder_name}/${alive_subdomain_folder_name}_nuclei_op/technologies.txt
-		nuclei -target $alive_subdomain -t "/home/penelope/tools/nuclei-templates/tokens/*.yaml" -c 60 -o  $bin/alive_${alive_subdomain_folder_name}/${alive_subdomain_folder_name}_nuclei_op/tokens.txt
-		nuclei -target $alive_subdomain -t "/home/penelope/tools/nuclei-templates/vulnerabilities/*.yaml" -c 60 -o  $bin/alive_${alive_subdomain_folder_name}/${alive_subdomain_folder_name}_nuclei_op/vulnerabilities.txt
-
-		# Cleaning directories that are empty
-		#if [ "$(ls -A $bin)" ];
-		#then
-		#	echo ''
-		#else
-		#	rm -rf $bin/
-		#fi
-
-		#if [ "$(ls -A $bin/../)" ];
-		#then
-		#	echo ''
-		#else
-		#	rm -rf $bin/../
-		#fi
-
-	done < $bin/${domain}_alive_subdomains.txt;
+		nuclei -target ${alive_subdomain} -t "/home/penelope/tools/nuclei-templates/cves/*.yaml" -c 60 -o  $bin/alive_${alive_subdomain_folder_name}/${alive_subdomain_folder_name}_nuclei_op/cves.txt
+		nuclei -target ${alive_subdomain} -t "/home/penelope/tools/nuclei-templates/files/*.yaml" -c 60 -o  $bin/alive_${alive_subdomain_folder_name}/${alive_subdomain_folder_name}_nuclei_op/files.txt
+		nuclei -target ${alive_subdomain} -t "/home/penelope/tools/nuclei-templates/panels/*.yaml" -c 60 -o  $bin/alive_${alive_subdomain_folder_name}/${alive_subdomain_folder_name}_nuclei_op/panels.txt
+		nuclei -target ${alive_subdomain} -t "/home/penelope/tools/nuclei-templates/security-misconfiguration/*.yaml" -c 60 -o  $bin/alive_${alive_subdomain_folder_name}/${alive_subdomain_folder_name}_nuclei_op/security-misconfiguration.txt
+		nuclei -target ${alive_subdomain} -t "/home/penelope/tools/nuclei-templates/technologies/*.yaml" -c 60 -o  $bin/alive_${alive_subdomain_folder_name}/${alive_subdomain_folder_name}_nuclei_op/technologies.txt
+		nuclei -target ${alive_subdomain} -t "/home/penelope/tools/nuclei-templates/tokens/*.yaml" -c 60 -o  $bin/alive_${alive_subdomain_folder_name}/${alive_subdomain_folder_name}_nuclei_op/tokens.txt
+		nuclei -target ${alive_subdomain} -t "/home/penelope/tools/nuclei-templates/vulnerabilities/*.yaml" -c 60 -o  $bin/alive_${alive_subdomain_folder_name}/${alive_subdomain_folder_name}_nuclei_op/vulnerabilities.txt
+		nuclei -target ${alive_subdomain} -t "/home/penelope/tools/nuclei-templates/subdomain-takeover/*.yaml" -c 60 -o  $bin/alive_${alive_subdomain_folder_name}/${alive_subdomain_folder_name}_nuclei_op/subdomain-takeover.txt
+	done
 	
 	# Javascript work
 
-	mkdir -p $bin/javascript_work/scripts
-	mkdir -p $bin/javascript_work/scriptsresponse
-	mkdir -p $bin/javascript_work/endpoints
-	mkdir -p $bin/javascript_work/responsebody
-	mkdir -p $bin/javascript_work/headers
+	mkdir -p ${bin}/javascript_work/scripts
+	mkdir -p ${bin}/javascript_work/scriptsresponse
+	mkdir -p ${bin}/javascript_work/endpoints
+	mkdir -p ${bin}/javascript_work/responsebody
+	mkdir -p ${bin}/javascript_work/headers
 
 	jsep()
 {
 		response(){
 		echo "Gathering Response"       
-		        for x in $(cat $bin/${domain}_alive_subdomains.txt); do
+		        for x in $(cat ${bin}/${domain}_alive_subdomains.txt); do
 		        NAME=$(echo $x | awk -F/ '{print $3}')
-		        curl -X GET -H "X-Forwarded-For: evil.com" $x -I | tee -a "$bin/javascript_work/headers/$NAME" 
-		        curl -s -X GET -H "X-Forwarded-For: evil.com" -L $x |tee -a "$bin/javascript_work/responsebody/$NAME"
+		        curl -X GET -H "X-Forwarded-For: evil.com" $x -I | tee -a "${bin}/javascript_work/headers/$NAME" 
+		        curl -s -X GET -H "X-Forwarded-For: evil.com" -L $x |tee -a "${bin}/javascript_work/responsebody/$NAME"
 		done
 		}
 
 		jsfinder(){
 		echo "Gathering JS Files"       
-		for x in $(ls "$bin/javascript_work/responsebody"); do
-		        printf "\n\n${RED}$x${NC}\n\n"
-		        END_POINTS=$(cat "$bin/javascript_work/responsebody/$x" | grep -Eoi "src=\"[^>]+></script>" | cut -d '"' -f 2)
+		for x in $(ls "${bin}/javascript_work/responsebody"); do
+		        printf "\n\n${RED}${x}${NC}\n\n"
+		        END_POINTS=$(cat "${bin}/javascript_work/responsebody/${x}" | grep -Eoi "src=\"[^>]+></script>" | cut -d '"' -f 2)
 		        for end_point in $END_POINTS; do
-		                len=$(echo $end_point | grep "http" | wc -c)
-		                mkdir "$bin/javascript_work/scriptsresponse/$x/" > /dev/null 2>&1
-		                URL=$end_point
-		                if [ $len == 0 ]
+		                len=$(echo ${end_point} | grep "http" | wc -c)
+		                mkdir "${bin}/javascript_work/scriptsresponse/$x/" > /dev/null 2>&1
+		                URL=${end_point}
+		                if [ ${len} == 0 ]
 		                then
-		                        URL="https://$x$end_point"
+		                        URL="https://${x}${end_point}"
 		                fi
-		                file=$(basename $end_point)
-		                curl -X GET $URL -L > "$bin/javascript_work/scriptsresponse/$x/$file"
-		                echo $URL | tee -a "$bin/javascript_work/scripts/$x"
+		                file=$(basename ${end_point})
+		                curl -X GET ${URL} -L > "${bin}/javascript_work/scriptsresponse/${x}/${file}"
+		                echo ${URL} | tee -a "${bin}/javascript_work/scripts/${x}"
 		        done
 		done
 		}
@@ -240,11 +225,11 @@ while read domain; do
 		endpoints()
 		{
 		echo "Gathering Endpoints"
-		for domain in $(ls $bin/javascript_work/scriptsresponse); do
+		for domain in $(ls ${bin}/javascript_work/scriptsresponse); do
 		        #looping through files in each domain
-		        mkdir $bin/javascript_work/endpoints/${domain}
-		        for file in $(ls $bin/javascript_work/scriptsresponse/${domain}); do
-		                ruby ~/tools/relative-url-extractor/extract.rb $bin/javascript_work/scriptsresponse/${domain}/$file | tee -a endpoints/${domain}/$file 
+		        mkdir ${bin}/javascript_work/endpoints/${domain}
+		        for file in $(ls ${bin}/javascript_work/scriptsresponse/${domain}); do
+		                ruby ~/tools/relative-url-extractor/extract.rb ${bin}/javascript_work/scriptsresponse/${domain}/$file | tee -a endpoints/${domain}/$file 
 		        done
 		done
 
@@ -253,28 +238,14 @@ while read domain; do
 		jsfinder
 		endpoints
 		}
-	#jsep
+	jsep
 
-	#dir=$PWD/${domain}
-	#bin=$dir/bin
-	
-	# Aquatone
-	mkdir $dir/aquatone
-	cat $bin/${domain}_alive_subdomains.txt | aquatone -out $dir/bin/aquatone
 
-	#Cleaning
-
-	#Markdown conversion begins here:
-
-	mkdir $bin/markdown
-	markdown_dir=$bin/markdown
-	cp $bin/${domain}_alive_subdomains.txt $markdown_dir
-	cp $bin/${domain}_subdomains.txt $markdown_dir	
-	cp $bin/${domain}_technologies.txt $markdown_dir	
 
 
 dir=$PWD/${domain}
-bin=$dir/bin
-done < $bin/roots.txt
+bin=${dir}/bin
+
+done < ${bin}/roots.txt
 
 
