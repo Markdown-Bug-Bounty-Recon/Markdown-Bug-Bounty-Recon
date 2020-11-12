@@ -93,40 +93,41 @@ for domain in $(cat ${bin}/roots.txt); do
 	## Analyzing Javascript with SubDomainizer and subscraper
 
 	SubDomainizer.py -l $bin/${domain}_javascript_files.txt -o $bin/${domain}_subdomains_subdomainizer.txt
-	uniq -u $bin/${domain}_subdomains.txt $bin/${domain}_subdomains_subdomainizer.txt | tee -a $bin/${domain}_subdomains.txt
+	cat $bin/${domain}_subdomains_subdomainizer.txt | tee -a $bin/${domain}_subdomains.txt
 
 
 	# Subdomain Scraping
 	amass enum -d ${domain} -o $bin/${domain}_subdomains_amass.txt
-	uniq -u $bin/${domain}_subdomains.txt $bin/${domain}_subdomains_amass.txt   | tee -a $bin/${domain}_subdomains.txt
+	cat $bin/${domain}_subdomains_amass.txt | tee -a $bin/${domain}_subdomains.txt
 	rm $bin/${domain}_subdomains_amass.txt
 
 	subfinder -d ${domain} -o $bin/${domain}_subdomains_subfinder.txt
-	uniq -u $bin/${domain}_subdomains.txt $bin/${domain}_subdomains_subfinder.txt | tee -a $bin/${domain}_subdomains.txt
+	cat $bin/${domain}_subdomains_subfinder.txt | tee -a $bin/${domain}_subdomains.txt
 	rm $bin/${domain}_subdomains_subfinder.txt
 
 	## From cloud ranges
 	curl 'https://tls.bufferover.run/dns?q=.${domain}' 2>/dev/null | jq .Results | cut -d ',' -f 3 | tr -d '\"' | tr -d ']' | tr -d '[' | tee -a $bin/${domain}_subdomains_cloud.txt # YES I KNOW THAT THESE 'TR' LOOK TERRIBLE, WILL CHANGE IT TO SED SOMEDAY OR GREP
-	uniq -u  $bin/${domain}_subdomains.txt $bin/${domain}_subdomains_cloud.txt | tee -a $bin/${domain}_subdomains.txt
+	cat $bin/${domain}_subdomains_cloud.txt | tee -a $bin/${domain}_subdomains.txt
 	rm $bin/${domain}_subdomains_cloud.txt
 	#github-subdomains.py -d ${domain} -o $bin/{domain}_subdomain_github.txt
 	# Checking if these subdomains are alive
 
-	cat $bin/${domain}_subdomains.txt | httprobe | tee -a $bin/${domain}_alive_subdomains.txt
+	cat $bin/${domain}_subdomains.txt | sort | uniq -u | tee $bin/${domain}_subdomains.txt
+	cat $bin/${domain}_subdomains.txt | httprobe | tee $bin/${domain}_alive_subdomains.txt
 
 
 	# Another while loop here for subdomains bruting
-	#while read subdomain;
-	#do
-		#amass enum -brute -d ${subdomain} -src -o $bin/${domain}_subdomain_bruting_amass.txt
+	while read subdomain;
+	do
+		amass enum -brute -d ${subdomain} -src -o $bin/${domain}_subdomain_bruting_amass.txt
 
-	#done < $bin/${domain}_alive_subdomains.txt
+	done < $bin/${domain}_alive_subdomains.txt
 
-	uniq -u $bin/${domain}_subdomains.txt $bin/${domain}_subdomain_bruting_amass.txt | tee -a $bin/${domain}_subdomains.txt
+	cat $bin/${domain}_subdomain_bruting_amass.txt | tee -a $bin/${domain}_subdomains.txt
 
 	cat $bin/${domain}_subdomains.txt | sort | uniq -u | tee $bin/${domain}_subdomains.txt
 
-	cat $bin/${domain}_subdomains.txt | httprobe | tee -a $bin/${domain}_alive_subdomains.txt
+	cat $bin/${domain}_subdomains.txt | httprobe | tee  $bin/${domain}_alive_subdomains.txt
 
 	#Small script to compare ${domain}_subdomains with alive to delete all alive lines that are in subdomains and pipe it to ${domain}_not_alive_subdomains.txt
 
@@ -169,7 +170,7 @@ for domain in $(cat ${bin}/roots.txt); do
 
 	for alive_subdomain in $(cat ${bin}/${domain}_alive_subdomains.txt); do
 		
-		alive_subdomain_folder_name=$(echo ${alive_subdomain} | tr -d "/" "_") # Because in creation of directories, the '/' letter is not escaped we need to cut out only domain.com and get rid of 'https://''
+		alive_subdomain_folder_name=$(echo ${alive_subdomain} | tr / _ ) # Because in creation of directories, the '/' letter is not escaped we need to cut out only domain.com and get rid of 'https://''
 		
 		mkdir ${bin}/alive_${alive_subdomain_folder_name}
 		mkdir ${bin}/alive_${alive_subdomain_folder_name}/${alive_subdomain_folder_name}_nuclei_op
@@ -197,7 +198,7 @@ for domain in $(cat ${bin}/roots.txt); do
 		response(){
 		echo "Gathering Response"       
 		        for x in $(cat ${bin}/${domain}_alive_subdomains.txt); do
-		        NAME=$(echo $x | awk -F/ '{print $3}')
+		        NAME=$(echo $x | tr / _ )
 		        curl -X GET -H "X-Forwarded-For: evil.com" $x -I | tee -a "${bin}/javascript_work/headers/$NAME" 
 		        curl -s -X GET -H "X-Forwarded-For: evil.com" -L $x |tee -a "${bin}/javascript_work/responsebody/$NAME"
 		done
@@ -211,22 +212,20 @@ for domain in $(cat ${bin}/roots.txt); do
 		        for end_point in $END_POINTS; do
 		                len=$(echo ${end_point} | grep "http" | wc -c)
 		                mkdir "${bin}/javascript_work/scriptsresponse/$x/" > /dev/null 2>&1
-		                URL=${end_point}
+		                URL=$(echo ${end_point} | sed  's/http:__//' | sed  's/https:__//')
 		                if [ ${len} == 0 ]
 		                then
 		                        URL="https://${x}${end_point}"
 		                fi
 		                file=$(basename ${end_point})
-		                curl -X GET ${URL} -L > "${bin}/javascript_work/scriptsresponse/${x}/${file}"
+		                curl -X GET ${URL} -L | js-beautify | tee "${bin}/javascript_work/scriptsresponse/${x}/${file}"
 		                echo ${URL} | tee -a "${bin}/javascript_work/scripts/${x}"
 		        done
 		done
 		}
-
-
-		}
 		response
 		jsfinder
+
 		}
 	jsep
 
