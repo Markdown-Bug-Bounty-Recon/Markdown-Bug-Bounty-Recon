@@ -1,4 +1,4 @@
-#!/bin/bash 
+#!/bin/bash
 
 usage(){
 
@@ -63,7 +63,7 @@ mkdir -p "${domain}"/bin
 dir=$PWD/${domain}
 bin=$dir/bin
 ## ASN Enumeration
- if [ -z "$ASN" ]; then
+ if [ -z ${ASN} ]; then
 	echo 'You did not supplied ASN number'
 	touch "${bin}"/roots.txt # Making empty file
 	echo "${domain}" >> "${bin}"/roots.txt
@@ -71,13 +71,13 @@ bin=$dir/bin
  	amass intel --asn "$ASN" -o "${bin}"/roots.txt
  fi
 
- sort  "${bin}"/roots.txt | uniq -u | tee "${bin}"/roots.txt
+ # sort "${bin}"/roots.txt | uniq -u | tee "${bin}"/tmp_roots.txt && mv "${bin}"/tmp_roots.txt "${bin}"/roots.txt
 
 # Getting resolvers for massdns ( we later use this )
- if [ -f "${bin}/resolvers.txt" ]; then
+ if [ -f "${bin}/resolvers.txt*" ]; then
  	echo "resolvers.txt file exists"
  else
- 	wget https://raw.githubusercontent.com/blechschmidt/massdns/master/lists/resolvers.txt >> "$bin"/resolvers.txt
+ 	wget https://raw.githubusercontent.com/blechschmidt/massdns/master/lists/resolvers.txt -O "$bin"/resolvers.txt
  fi
 
 # HERE'S THE PLACE FOR 'WHILE' STATEMENT
@@ -99,7 +99,7 @@ while read -r domain; do
 
 	## Analyzing Javascript with SubDomainizer and subscraper
 	SubDomainizer.py -l "$bin"/"${domain}"_javascript_files.txt -o "$bin"/"${domain}"_subdomains_subdomainizer.txt
-	"$bin"/"${domain}"_subdomains_subdomainizer.txt >> "$bin"/"${domain}"_subdomains.txt 
+	cat "$bin"/"${domain}"_subdomains_subdomainizer.txt >> "$bin"/"${domain}"_subdomains.txt 
 
 
 	# Subdomain Scraping
@@ -109,9 +109,9 @@ while read -r domain; do
 	wait
 
 	# Fetching the final results
-	"$bin"/"${domain}"_subdomains_amass.txt >> "$bin"/"${domain}"_subdomains.txt & 
-        "$bin"/"${domain}"_subdomains_subfinder.txt >> "$bin"/"${domain}"_subdomains.txt &
-	"$bin"/"${domain}"_subdomains_cloud.txt >> "$bin"/"${domain}"_subdomains.txt &
+	cat "$bin"/"${domain}"_subdomains_amass.txt >> "$bin"/"${domain}"_subdomains.txt & 
+    cat "$bin"/"${domain}"_subdomains_subfinder.txt >> "$bin"/"${domain}"_subdomains.txt &
+	cat "$bin"/"${domain}"_subdomains_cloud.txt >> "$bin"/"${domain}"_subdomains.txt &
 	wait
 	#Deleting the unnecessary
 	rm "$bin"/"${domain}"_subdomains_amass.txt &
@@ -120,39 +120,36 @@ while read -r domain; do
 	wait
 	# Checking if these subdomains are alive
 
-	 "$bin"/"${domain}"_subdomains.txt | sort | uniq -u | tee "$bin"/"${domain}"_subdomains.txt 
-	 "$bin"/"${domain}"_subdomains.txt | httprobe | tee "$bin"/tmp_"${domain}"_alive_subdomains.txt && mv tmp_"${domain}"_alive_subdomains.txt "${domain}"_alive_subdomains.txt
+	sort "$bin"/"${domain}"_subdomains.txt | uniq -u | tee "$bin"/tmp_"${domain}"_subdomains.txt && mv "$bin"/tmp_"${domain}"_subdomains.txt "$bin"/"${domain}"_subdomains.txt 
+	httprobe "$bin"/"${domain}"_subdomains.txt | tee "$bin"/tmp_"${domain}"_alive_subdomains.txt && mv "$bin"/tmp_"${domain}"_alive_subdomains.txt "$bin"/"${domain}"_alive_subdomains.txt
 
 
 	# Another while loop here for subdomains bruting with hyper-processing
 	
-	mkfifo tmp
-	counter=0
 	while read -r subdomain;
 	do
-		amass enum -brute -d "${subdomain}" -src -o "$bin"/"${domain}"_subdomain_bruting_amass.txt &
-		(( counter++ ));
-		if [ "$counter" -lt 10 ]; then
-			wait
-			counter=0
-		fi
-	done < "$bin"/"${domain}"_alive_subdomains.txt
+		parallel amass enum -brute -d "${subdomain}" -src -o "$bin"/"${domain}"_subdomain_bruting_amass.txt 
+	done
+	
+
 	wait
 
-	 "$bin"/"${domain}"_subdomain_bruting_amass.txt >> "$bin"/"${domain}"_subdomains.txt
+	 cat "$bin"/"${domain}"_subdomain_bruting_amass.txt >> "$bin"/"${domain}"_subdomains.txt
 
-	 "$bin"/"${domain}"_subdomains.txt | sort | uniq -u | "$bin"/"${domain}"_subdomains.txt
+	 cat "$bin"/"${domain}"_subdomains.txt | sort | uniq -u | tee -a "$bin"/tmp_"${domain}"_subdomains.txt && mv "$bin"/tmp_"${domain}"_subdomains.txt "$bin"/"${domain}"_subdomains.txt
 
-	 "$bin"/"${domain}"_subdomains.txt | httprobe | tee  "$bin"/"${domain}"_alive_subdomains.txt
+	 httprobe "$bin"/"${domain}"_subdomains.txt | tee  -a "$bin"/"${domain}"_alive_subdomains.txt
+
+
 
 	#Small script to compare ${domain}_subdomains with alive to delete all alive lines that are in subdomains and pipe it to ${domain}_not_alive_subdomains.txt
 
-	"$bin"/"${domain}"_alive_subdomains.txt | tr -d "/" | cut -d ":" -f 2 > "$bin"/"${domain}"_alive_subdomains_without_protocol.txt
-	grep -v -x "$bin"/"${domain}"_alive_subdomains_without_protocol.txt "$bin"/"${domain}"_subdomains.txt | tee "$bin"/"${domain}"_subdomains.txt
+	cat "$bin"/"${domain}"_alive_subdomains.txt | tr -d "/" | cut -d ":" -f 2 > "$bin"/"${domain}"_alive_subdomains_without_protocol.txt
+	grep -v -x "$bin"/"${domain}"_alive_subdomains_without_protocol.txt "$bin"/"${domain}"_subdomains.txt | tee "$bin"/tmp_"${domain}"_subdomains.txt && mv "$bin"/tmp_"${domain}"_subdomains.txt "$bin"/"${domain}"_subdomains.txt
 	rm "$bin"/"${domain}"_alive_subdomains_without_protocol.txt
 
 	# Favfreak
-	"$bin"/"${domain}"_alive_subdomains.txt | favfreak.py -o "$bin"/"${domain}"_favfreak
+	cat "$bin"/"${domain}"_alive_subdomains.txt | favfreak.py -o "$bin"/"${domain}"_favfreak
 	# Port scanning not alive hosts
 
 
@@ -216,7 +213,7 @@ while read -r domain; do
 		echo "Gathering JS Files"       
 		for x in $(ls "${bin}/javascript_work/responsebody"); do
 		        printf "\n\n${RED}${x}${NC}\n\n"
-		        END_POINTS=$("${bin}/javascript_work/responsebody/${x}" | grep -Eoi "src=\"[^>]+></script>" | cut -d '"' -f 2)
+		        END_POINTS=$(cat "${bin}/javascript_work/responsebody/${x}" | grep -Eoi "src=\"[^>]+></script>" | cut -d '"' -f 2)
 		        for end_point in $END_POINTS; do
 		                len=$(echo "${end_point}" | grep "http" | wc -c)
 		                mkdir "${bin}/javascript_work/scriptsresponse/$x/" > /dev/null 2>&1
