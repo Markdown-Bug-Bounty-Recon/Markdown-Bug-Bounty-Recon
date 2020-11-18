@@ -71,7 +71,7 @@ bin=$dir/bin
  	amass intel --asn "$ASN" -o "${bin}"/roots.txt
  fi
 
-cat "${bin}"/roots.txt | sort | uniq -u | tee "${bin}"/roots.txt
+ sort  "${bin}"/roots.txt | uniq -u | tee "${bin}"/roots.txt
 
 # Getting resolvers for massdns ( we later use this )
  if [ -f "${bin}/resolvers.txt" ]; then
@@ -81,7 +81,7 @@ cat "${bin}"/roots.txt | sort | uniq -u | tee "${bin}"/roots.txt
  fi
 
 # HERE'S THE PLACE FOR 'WHILE' STATEMENT
-for domain in $(cat "${bin}"/roots.txt); do
+while read -r domain; do
 	mkdir "$bin"/"${domain}"
 	bin=$dir/bin/${domain}
 	## Wappalyzer / Listing Technologies
@@ -99,19 +99,19 @@ for domain in $(cat "${bin}"/roots.txt); do
 
 	## Analyzing Javascript with SubDomainizer and subscraper
 	SubDomainizer.py -l "$bin"/"${domain}"_javascript_files.txt -o "$bin"/"${domain}"_subdomains_subdomainizer.txt
-	cat "$bin"/"${domain}"_subdomains_subdomainizer.txt | tee -a "$bin"/"${domain}"_subdomains.txt 
+	"$bin"/"${domain}"_subdomains_subdomainizer.txt >> "$bin"/"${domain}"_subdomains.txt 
 
 
 	# Subdomain Scraping
 	amass enum -d "${domain}" -o "$bin"/"${domain}"_subdomains_amass.txt &
 	subfinder -d "${domain}" -o "$bin"/"${domain}"_subdomains_subfinder.txt &
-	curl 'https://tls.bufferover.run/dns?q=.${domain}' 2>/dev/null | jq .Results | cut -d ',' -f 3 | tr -d '\"' | tr -d ']' | tr -d '[' | tee -a "$bin"/"${domain}"_subdomains_cloud.txt & # YES I KNOW THAT THESE 'TR' LOOK TERRIBLE, WILL CHANGE IT TO SED SOMEDAY OR GREP
+	curl "https://tls.bufferover.run/dns?q=.${domain}" 2>/dev/null | jq .Results | cut -d ',' -f 3 | tr -d '\"' | tr -d ']' | tr -d '[' | tee -a "$bin"/"${domain}"_subdomains_cloud.txt & # YES I KNOW THAT THESE 'TR' LOOK TERRIBLE, WILL CHANGE IT TO SED SOMEDAY OR GREP
 	wait
 
 	# Fetching the final results
-	cat "$bin"/"${domain}"_subdomains_amass.txt | tee -a "$bin"/"${domain}"_subdomains.txt & 
-	cat "$bin"/"${domain}"_subdomains_subfinder.txt | tee -a "$bin"/"${domain}"_subdomains.txt &
-	cat "$bin"/"${domain}"_subdomains_cloud.txt | tee -a "$bin"/"${domain}"_subdomains.txt &
+	"$bin"/"${domain}"_subdomains_amass.txt >> "$bin"/"${domain}"_subdomains.txt & 
+        "$bin"/"${domain}"_subdomains_subfinder.txt >> "$bin"/"${domain}"_subdomains.txt &
+	"$bin"/"${domain}"_subdomains_cloud.txt >> "$bin"/"${domain}"_subdomains.txt &
 	wait
 	#Deleting the unnecessary
 	rm "$bin"/"${domain}"_subdomains_amass.txt &
@@ -120,48 +120,46 @@ for domain in $(cat "${bin}"/roots.txt); do
 	wait
 	# Checking if these subdomains are alive
 
-	cat "$bin"/"${domain}"_subdomains.txt | sort | uniq -u | tee "$bin"/"${domain}"_subdomains.txt 
-	cat "$bin"/"${domain}"_subdomains.txt | httprobe | tee "$bin"/"${domain}"_alive_subdomains.txt
+	 "$bin"/"${domain}"_subdomains.txt | sort | uniq -u | tee "$bin"/"${domain}"_subdomains.txt 
+	 "$bin"/"${domain}"_subdomains.txt | httprobe | tee "$bin"/tmp_"${domain}"_alive_subdomains.txt && mv tmp_"${domain}"_alive_subdomains.txt "${domain}"_alive_subdomains.txt
 
 
 	# Another while loop here for subdomains bruting with hyper-processing
 	
 	mkfifo tmp
 	counter=0
-	while read subdomain;
+	while read -r subdomain;
 	do
 		amass enum -brute -d "${subdomain}" -src -o "$bin"/"${domain}"_subdomain_bruting_amass.txt &
-		let $[counter++];
+		(( counter++ ));
 		if [ "$counter" -lt 10 ]; then
 			wait
 			counter=0
 		fi
-	done 
-		
-
 	done < "$bin"/"${domain}"_alive_subdomains.txt
 	wait
 
-	cat "$bin"/"${domain}"_subdomain_bruting_amass.txt | tee -a "$bin"/"${domain}"_subdomains.txt
+	 "$bin"/"${domain}"_subdomain_bruting_amass.txt >> "$bin"/"${domain}"_subdomains.txt
 
-	cat "$bin"/"${domain}"_subdomains.txt | sort | uniq -u | tee "$bin"/"${domain}"_subdomains.txt
+	 "$bin"/"${domain}"_subdomains.txt | sort | uniq -u | "$bin"/"${domain}"_subdomains.txt
 
-	cat "$bin"/"${domain}"_subdomains.txt | httprobe | tee  "$bin"/"${domain}"_alive_subdomains.txt
+	 "$bin"/"${domain}"_subdomains.txt | httprobe | tee  "$bin"/"${domain}"_alive_subdomains.txt
 
 	#Small script to compare ${domain}_subdomains with alive to delete all alive lines that are in subdomains and pipe it to ${domain}_not_alive_subdomains.txt
 
-	cat "$bin"/"${domain}"_alive_subdomains.txt | tr -d "/" | cut -d ":" -f 2 > "$bin"/"${domain}"_alive_subdomains_without_protocol.txt
+	"$bin"/"${domain}"_alive_subdomains.txt | tr -d "/" | cut -d ":" -f 2 > "$bin"/"${domain}"_alive_subdomains_without_protocol.txt
 	grep -v -x "$bin"/"${domain}"_alive_subdomains_without_protocol.txt "$bin"/"${domain}"_subdomains.txt | tee "$bin"/"${domain}"_subdomains.txt
 	rm "$bin"/"${domain}"_alive_subdomains_without_protocol.txt
 
 	# Favfreak
-	cat "$bin"/"${domain}"_alive_subdomains.txt | favfreak.py -o "$bin"/"${domain}"_favfreak
+	"$bin"/"${domain}"_alive_subdomains.txt | favfreak.py -o "$bin"/"${domain}"_favfreak
 	# Port scanning not alive hosts
 
 
 	massdns --resolvers "$dir"/bin/resolvers.txt -t AAAA "${bin}"/"${domain}"_subdomains.txt > "${bin}"/dns-resolved-ip.txt
 
-	for subdomain in $(cat "${bin}"/"${domain}"_subdomains.txt); do
+	while read -r subdomain; 
+	do
 		mkdir "$bin"/not_alive_"${subdomain}"
 		
 		masscan "${subdomain}" -p0-65535 -oG "${bin}"/not_alive_"${subdomain}"/masscan.grepable
@@ -173,10 +171,10 @@ for domain in $(cat "${bin}"/roots.txt); do
 		#brutespray -f $bin/not_alive_${subdomain}/${domain}_${subdomain}_nmap.txt -o $bin/not_alive_${subdomain}/${domain}_${subdomain}_brutespray
 
 
-	done
+	done< "${bin}"/"${domain}"_subdomains.txt
 
 
-	for alive_subdomain in $(cat "${bin}"/"${domain}"_alive_subdomains.txt); do
+	while read -r alive_subdomain; do
 		
 		alive_subdomain_folder_name=$(echo "${alive_subdomain}" | tr / _ ) # Because in creation of directories, the '/' letter is not escaped we need to cut out only domain.com and get rid of 'https://''
 		
@@ -192,7 +190,7 @@ for domain in $(cat "${bin}"/roots.txt); do
 		nuclei -target "${alive_subdomain}" -t "/home/penelope/tools/nuclei-templates/vulnerabilities/*.yaml" -c 60 -o  "$bin"/alive_"${alive_subdomain_folder_name}"/"${alive_subdomain_folder_name}"_nuclei_op/vulnerabilities.txt &
 		nuclei -target "${alive_subdomain}" -t "/home/penelope/tools/nuclei-templates/subdomain-takeover/*.yaml" -c 60 -o  "$bin"/alive_"${alive_subdomain_folder_name}"/"${alive_subdomain_folder_name}"_nuclei_op/subdomain-takeover.txt &
 		wait
-	done
+	done < "${bin}"/"${domain}"_alive_subdomains.txt
 	
 	# Javascript work
 
@@ -207,18 +205,18 @@ for domain in $(cat "${bin}"/roots.txt); do
 {
 		response(){
 		echo "Gathering Response"       
-		        for x in $(cat "${bin}"/"${domain}"_alive_subdomains.txt); do
+		        while read -r x; do
 		        NAME=$(echo "$x" | tr / _ )
 		        curl -X GET -H "X-Forwarded-For: evil.com" "$x" -I | tee -a "${bin}/javascript_work/headers/$NAME" 
 		        curl -s -X GET -H "X-Forwarded-For: evil.com" -L "$x" |tee -a "${bin}/javascript_work/responsebody/$NAME"
-		done
+		done < "${bin}"/"${domain}"_alive_subdomains.txt
 		}
 
 		jsfinder(){
 		echo "Gathering JS Files"       
 		for x in $(ls "${bin}/javascript_work/responsebody"); do
 		        printf "\n\n${RED}${x}${NC}\n\n"
-		        END_POINTS=$(cat "${bin}/javascript_work/responsebody/${x}" | grep -Eoi "src=\"[^>]+></script>" | cut -d '"' -f 2)
+		        END_POINTS=$("${bin}/javascript_work/responsebody/${x}" | grep -Eoi "src=\"[^>]+></script>" | cut -d '"' -f 2)
 		        for end_point in $END_POINTS; do
 		                len=$(echo "${end_point}" | grep "http" | wc -c)
 		                mkdir "${bin}/javascript_work/scriptsresponse/$x/" > /dev/null 2>&1
@@ -242,4 +240,4 @@ for domain in $(cat "${bin}"/roots.txt); do
 	dir=$PWD/${domain}
 	bin=${dir}/bin
 
-done < ${bin}/roots.txt
+done < "${bin}"/roots.txt
