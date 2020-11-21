@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash 
 
 usage(){
 
@@ -71,13 +71,14 @@ bin=$dir/bin
  	amass intel --asn "$ASN" -o "${bin}"/roots.txt
  fi
 
- # sort "${bin}"/roots.txt | uniq -u | tee "${bin}"/tmp_roots.txt && mv "${bin}"/tmp_roots.txt "${bin}"/roots.txt
+  sort "${bin}"/roots.txt | uniq | tee "${bin}"/tmp_roots.txt && mv "${bin}"/tmp_roots.txt "${bin}"/roots.txt
 
 # Getting resolvers for massdns ( we later use this )
- if [ -f "${bin}/resolvers.txt*" ]; then
+ if [ -f "~/lists/resolvers.txt*" ]; then
  	echo "resolvers.txt file exists"
  else
- 	wget https://raw.githubusercontent.com/blechschmidt/massdns/master/lists/resolvers.txt -O "$bin"/resolvers.txt
+ 	mkdir ~/lists/
+ 	wget https://raw.githubusercontent.com/blechschmidt/massdns/master/lists/resolvers.txt -O ~/lists/resolvers.txt
  fi
 
 # HERE'S THE PLACE FOR 'WHILE' STATEMENT
@@ -99,7 +100,6 @@ while read -r domain; do
 
 	## Analyzing Javascript with SubDomainizer and subscraper
 	SubDomainizer.py -l "$bin"/"${domain}"_javascript_files.txt -o "$bin"/"${domain}"_subdomains_subdomainizer.txt
-	cat "$bin"/"${domain}"_subdomains_subdomainizer.txt >> "$bin"/"${domain}"_subdomains.txt 
 
 
 	# Subdomain Scraping
@@ -112,33 +112,35 @@ while read -r domain; do
 	cat "$bin"/"${domain}"_subdomains_amass.txt >> "$bin"/"${domain}"_subdomains.txt & 
     cat "$bin"/"${domain}"_subdomains_subfinder.txt >> "$bin"/"${domain}"_subdomains.txt &
 	cat "$bin"/"${domain}"_subdomains_cloud.txt >> "$bin"/"${domain}"_subdomains.txt &
+	cat "$bin"/"${domain}"_subdomains_subdomainizer.txt >> "$bin"/"${domain}"_subdomains.txt & 
 	wait
 	#Deleting the unnecessary
 	rm "$bin"/"${domain}"_subdomains_amass.txt &
 	rm "$bin"/"${domain}"_subdomains_subfinder.txt &
 	rm "$bin"/"${domain}"_subdomains_cloud.txt &
+	rm "$bin"/"${domain}"_subdomains_subdomainizer.txt &
 	wait
 	# Checking if these subdomains are alive
 
-	sort "$bin"/"${domain}"_subdomains.txt | uniq -u | tee "$bin"/tmp_"${domain}"_subdomains.txt && mv "$bin"/tmp_"${domain}"_subdomains.txt "$bin"/"${domain}"_subdomains.txt 
-	httprobe "$bin"/"${domain}"_subdomains.txt | tee "$bin"/tmp_"${domain}"_alive_subdomains.txt && mv "$bin"/tmp_"${domain}"_alive_subdomains.txt "$bin"/"${domain}"_alive_subdomains.txt
-
+	sort "$bin"/"${domain}"_subdomains.txt | uniq | tee "$bin"/tmp_"${domain}"_subdomains.txt && mv "$bin"/tmp_"${domain}"_subdomains.txt "$bin"/"${domain}"_subdomains.txt 
 
 	# Another while loop here for subdomains bruting with hyper-processing
 	
-	while read -r subdomain;
-	do
-		parallel amass enum -brute -d "${subdomain}" -src -o "$bin"/"${domain}"_subdomain_bruting_amass.txt 
-	done
+	touch "$bin"/"${domain}"_subdomain_bruting_amass.txt 
+	amass enum -brute -d "$bin"/"${domain}"_subdomains.txt -src -o "$bin"/"${domain}"_subdomain_bruting_amass.txt
+
+	#while read -r subdomain;
+	#do
+	#	amass enum -brute -d "${subdomain}" -src -o "$bin"/"${domain}"_subdomain_bruting_amass.txt &
+	#done < "$bin"/"${domain}"_subdomains.txt 
 	
 
 	wait
+	cat "$bin"/"${domain}"_subdomain_bruting_amass.txt >> "$bin"/"${domain}"_subdomains.txt
 
-	 cat "$bin"/"${domain}"_subdomain_bruting_amass.txt >> "$bin"/"${domain}"_subdomains.txt
+	cat "$bin"/"${domain}"_subdomains.txt | sort | uniq | tee -a "$bin"/tmp_"${domain}"_subdomains.txt && mv "$bin"/tmp_"${domain}"_subdomains.txt "$bin"/"${domain}"_subdomains.txt
 
-	 cat "$bin"/"${domain}"_subdomains.txt | sort | uniq -u | tee -a "$bin"/tmp_"${domain}"_subdomains.txt && mv "$bin"/tmp_"${domain}"_subdomains.txt "$bin"/"${domain}"_subdomains.txt
-
-	 httprobe "$bin"/"${domain}"_subdomains.txt | tee  -a "$bin"/"${domain}"_alive_subdomains.txt
+	cat "$bin"/"${domain}"_subdomains.txt | httprobe | tee  -a "$bin"/"${domain}"_alive_subdomains.txt
 
 
 
@@ -146,21 +148,21 @@ while read -r domain; do
 
 	cat "$bin"/"${domain}"_alive_subdomains.txt | tr -d "/" | cut -d ":" -f 2 > "$bin"/"${domain}"_alive_subdomains_without_protocol.txt
 	grep -v -x "$bin"/"${domain}"_alive_subdomains_without_protocol.txt "$bin"/"${domain}"_subdomains.txt | tee "$bin"/tmp_"${domain}"_subdomains.txt && mv "$bin"/tmp_"${domain}"_subdomains.txt "$bin"/"${domain}"_subdomains.txt
-	rm "$bin"/"${domain}"_alive_subdomains_without_protocol.txt
+	#rm "$bin"/"${domain}"_alive_subdomains_without_protocol.txt
 
 	# Favfreak
 	cat "$bin"/"${domain}"_alive_subdomains.txt | favfreak.py -o "$bin"/"${domain}"_favfreak
 	# Port scanning not alive hosts
 
 
-	massdns --resolvers "$dir"/bin/resolvers.txt -t AAAA "${bin}"/"${domain}"_subdomains.txt > "${bin}"/dns-resolved-ip.txt
-
+	#massdns --resolvers "$dir"/bin/resolvers.txt -t AAAA "$bin"/"${domain}"_subdomains.txt >> "${bin}"/dns-resolved-ip.txt
 	while read -r subdomain; 
 	do
+		ip=$(massdns --resolvers "$dir"/bin/resolvers.txt -t AAAA $subdomain)
 		mkdir "$bin"/not_alive_"${subdomain}"
 		
-		masscan "${subdomain}" -p0-65535 -oG "${bin}"/not_alive_"${subdomain}"/masscan.grepable
 
+		masscan "${ip}" -p0-65535 -oG "${bin}"/not_alive_"${subdomain}"/masscan_grepable
 		# NMAP SCAN WITH -oG flag output
 		
 
@@ -168,25 +170,25 @@ while read -r domain; do
 		#brutespray -f $bin/not_alive_${subdomain}/${domain}_${subdomain}_nmap.txt -o $bin/not_alive_${subdomain}/${domain}_${subdomain}_brutespray
 
 
-	done< "${bin}"/"${domain}"_subdomains.txt
+	done < "$bin"/"${domain}"_subdomains.txt
 
+	wait
 
 	while read -r alive_subdomain; do
 		
-		alive_subdomain_folder_name=$(echo "${alive_subdomain}" | tr / _ ) # Because in creation of directories, the '/' letter is not escaped we need to cut out only domain.com and get rid of 'https://''
+		alive_subdomain_folder_name=$(echo "${alive_subdomain}" | tr / _ ) # Because in creation of directories, the '/' letter is not escaped we need to cut out only domain.com and get rid of 'https://'' 
 		
-		mkdir "${bin}"/alive_"${alive_subdomain_folder_name}"
-		mkdir "${bin}"/alive_"${alive_subdomain_folder_name}"/"${alive_subdomain_folder_name}"_nuclei_op
+		mkdir "${bin}"/alive_"${alive_subdomain_folder_name}" 
+		mkdir "${bin}"/alive_"${alive_subdomain_folder_name}"/"${alive_subdomain_folder_name}"_nuclei_op 
 
-		nuclei -target "${alive_subdomain}" -t "/home/penelope/tools/nuclei-templates/cves/*.yaml" -c 60 -o  "$bin"/alive_"${alive_subdomain_folder_name}"/"${alive_subdomain_folder_name}"_nuclei_op/cves.txt &
-		nuclei -target "${alive_subdomain}" -t "/home/penelope/tools/nuclei-templates/files/*.yaml" -c 60 -o  "$bin"/alive_"${alive_subdomain_folder_name}"/"${alive_subdomain_folder_name}"_nuclei_op/files.txt &
-		nuclei -target "${alive_subdomain}" -t "/home/penelope/tools/nuclei-templates/panels/*.yaml" -c 60 -o  "$bin"/alive_"${alive_subdomain_folder_name}"/"${alive_subdomain_folder_name}"_nuclei_op/panels.txt &
-		nuclei -target "${alive_subdomain}" -t "/home/penelope/tools/nuclei-templates/security-misconfiguration/*.yaml" -c 60 -o  "$bin"/alive_"${alive_subdomain_folder_name}"/"${alive_subdomain_folder_name}"_nuclei_op/security-misconfiguration.txt &
-		nuclei -target "${alive_subdomain}" -t "/home/penelope/tools/nuclei-templates/technologies/*.yaml" -c 60 -o  "$bin"/alive_"${alive_subdomain_folder_name}"/"${alive_subdomain_folder_name}"_nuclei_op/technologies.txt &
-		nuclei -target "${alive_subdomain}" -t "/home/penelope/tools/nuclei-templates/tokens/*.yaml" -c 60 -o  "$bin"/alive_"${alive_subdomain_folder_name}"/"${alive_subdomain_folder_name}"_nuclei_op/tokens.txt &
-		nuclei -target "${alive_subdomain}" -t "/home/penelope/tools/nuclei-templates/vulnerabilities/*.yaml" -c 60 -o  "$bin"/alive_"${alive_subdomain_folder_name}"/"${alive_subdomain_folder_name}"_nuclei_op/vulnerabilities.txt &
-		nuclei -target "${alive_subdomain}" -t "/home/penelope/tools/nuclei-templates/subdomain-takeover/*.yaml" -c 60 -o  "$bin"/alive_"${alive_subdomain_folder_name}"/"${alive_subdomain_folder_name}"_nuclei_op/subdomain-takeover.txt &
-		wait
+		nuclei -target "${alive_subdomain}" -t "/home/penelope/tools/nuclei-templates/cves/*.yaml" -c 60 -o  "$bin"/alive_"${alive_subdomain_folder_name}"/"${alive_subdomain_folder_name}"_nuclei_op/cves.txt 
+		nuclei -target "${alive_subdomain}" -t "/home/penelope/tools/nuclei-templates/files/*.yaml" -c 60 -o  "$bin"/alive_"${alive_subdomain_folder_name}"/"${alive_subdomain_folder_name}"_nuclei_op/files.txt 
+		nuclei -target "${alive_subdomain}" -t "/home/penelope/tools/nuclei-templates/panels/*.yaml" -c 60 -o  "$bin"/alive_"${alive_subdomain_folder_name}"/"${alive_subdomain_folder_name}"_nuclei_op/panels.txt 
+		nuclei -target "${alive_subdomain}" -t "/home/penelope/tools/nuclei-templates/security-misconfiguration/*.yaml" -c 60 -o  "$bin"/alive_"${alive_subdomain_folder_name}"/"${alive_subdomain_folder_name}"_nuclei_op/security-misconfiguration.txt 
+		nuclei -target "${alive_subdomain}" -t "/home/penelope/tools/nuclei-templates/technologies/*.yaml" -c 60 -o  "$bin"/alive_"${alive_subdomain_folder_name}"/"${alive_subdomain_folder_name}"_nuclei_op/technologies.txt 
+		nuclei -target "${alive_subdomain}" -t "/home/penelope/tools/nuclei-templates/tokens/*.yaml" -c 60 -o  "$bin"/alive_"${alive_subdomain_folder_name}"/"${alive_subdomain_folder_name}"_nuclei_op/tokens.txt 
+		nuclei -target "${alive_subdomain}" -t "/home/penelope/tools/nuclei-templates/vulnerabilities/*.yaml" -c 60 -o  "$bin"/alive_"${alive_subdomain_folder_name}"/"${alive_subdomain_folder_name}"_nuclei_op/vulnerabilities.txt 
+		nuclei -target "${alive_subdomain}" -t "/home/penelope/tools/nuclei-templates/subdomain-takeover/*.yaml" -c 60 -o  "$bin"/alive_"${alive_subdomain_folder_name}"/"${alive_subdomain_folder_name}"_nuclei_op/subdomain-takeover.txt 
 	done < "${bin}"/"${domain}"_alive_subdomains.txt
 	
 	# Javascript work
