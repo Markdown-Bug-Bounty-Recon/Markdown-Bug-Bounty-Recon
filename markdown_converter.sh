@@ -82,7 +82,7 @@ echo "## SUBDOMAINS OVERVIEW" >> ${markdown_dir}/alive_${alive_subdomain_folder_
 	echo "## NOT ALIVE SUBDOMAINS" >> ${markdown_dir}/${domain}_report.mdpp
 	echo "!INCLUDE \"${markdown_dir}/${domain}_subdomains.mdpp\"" >> ${markdown_dir}/${domain}_report.mdpp
 
-	for subdomain in $(cat ${bin}/${domain}_subdomains.txt); do
+	for subdomain in $(cat "$bin"/"${domain}"_alive_subdomains_without_protocol.txt); do
 		mkdir ${markdown_dir}/not_alive_${subdomain}
 		touch ${markdown_dir}/not_alive_${subdomain}/notes.md
 		touch ${markdown_dir}/not_alive_${subdomain}/report_${subdomain}.mdpp
