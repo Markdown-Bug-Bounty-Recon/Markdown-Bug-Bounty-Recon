@@ -146,8 +146,11 @@ while read -r domain; do
 
 	#Small script to compare ${domain}_subdomains with alive to delete all alive lines that are in subdomains and pipe it to ${domain}_not_alive_subdomains.txt
 
-	cat "$bin"/"${domain}"_alive_subdomains.txt | tr -d "/" | cut -d ":" -f 2 > "$bin"/"${domain}"_alive_subdomains_without_protocol.txt
-	grep -v -x "$bin"/"${domain}"_alive_subdomains_without_protocol.txt "$bin"/"${domain}"_subdomains.txt | tee "$bin"/tmp_"${domain}"_subdomains.txt && mv "$bin"/tmp_"${domain}"_subdomains.txt "$bin"/"${domain}"_subdomains.txt
+	cat "$bin"/"${domain}"_alive_subdomains.txt | tr -d "/" | cut -d ":" -f 2 | sort | uniq > "$bin"/"${domain}"_alive_subdomains_without_protocol.txt
+	
+
+	grep -v -x -f "$bin"/"${domain}"_subdomains.txt "$bin"/"${domain}"_alive_subdomains_without_protocol.txt | tee "$bin"/tmp_"${domain}"_subdomains.txt && mv "$bin"/tmp_"${domain}"_subdomains.txt "$bin"/"${domain}"_subdomains.txt
+
 	#rm "$bin"/"${domain}"_alive_subdomains_without_protocol.txt
 
 	# Favfreak
@@ -158,6 +161,10 @@ while read -r domain; do
 	#massdns --resolvers "$dir"/bin/resolvers.txt -t AAAA "$bin"/"${domain}"_subdomains.txt >> "${bin}"/dns-resolved-ip.txt
 	while read -r subdomain; 
 	do
+		liveTargetsFinder.py --target-list hoplr.com_subdomains.txt --massdns-path /home/penelope/tools/massdns/bin/massdns --masscan-path /home/penelope/tools/masscan/bin/masscan
+
+
+
 		ip=$(massdns --resolvers "$dir"/bin/resolvers.txt -t AAAA $subdomain)
 		mkdir "$bin"/not_alive_"${subdomain}"
 		
