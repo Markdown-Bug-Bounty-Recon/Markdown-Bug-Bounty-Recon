@@ -1,4 +1,4 @@
-#!/bin/bash -v
+#!/bin/bash
 
 usage(){
 
@@ -25,7 +25,7 @@ usage(){
 #	esac
 #done
 
-while getopts d:a:u OPTION; do
+while getopts d:a:u: OPTION; do
 	case $OPTION in
 		d)
 		domain="$OPTARG"
@@ -34,7 +34,7 @@ while getopts d:a:u OPTION; do
 		ASN="$OPTARG"
 		;;
 		u)
-		USER="$OPTARG"
+		USER_EXEC="$OPTARG"
 		;;
 		?)
 		usage
@@ -42,8 +42,17 @@ while getopts d:a:u OPTION; do
 	esac
 done
 
-dirsearchWordlist=/home/"${USER}"/tools/dirsearch/db/dicc.txt
-massdnsWordlist=/home/"${USER}"/tools/SecLists/Discovery/DNS/clean-jhaddix-dns.txt
+echo ${USER_EXEC}
+
+ if [ -z "${USER_EXEC}" ]; then
+ 	echo "You did not passed another ${USER} account, executing as root user"
+ 	USER_EXEC=root
+ else
+ 	echo "You passed another ${USER} account"
+ fi
+
+dirsearchWordlist=/home/"${USER_EXEC}"/tools/dirsearch/db/dicc.txt
+massdnsWordlist=/home/"${USER_EXEC}"/tools/SecLists/Discovery/DNS/clean-jhaddix-dns.txt
 
 mkdir "${domain}"
 if [ -f "./${domain}/Acquisitions.txt" ];then
@@ -80,21 +89,18 @@ bin=$dir/bin
  	exit 1
  fi
 
- if [ -z ${USER} ]; then
- 	USER=penelope
- else
- 	echo "You passed another USER account"
- fi
 
   sort "${bin}"/roots.txt | uniq | tee "${bin}"/tmp_roots.txt && mv "${bin}"/tmp_roots.txt "${bin}"/roots.txt
 
 # Getting resolvers for massdns ( we later use this )
- if [ -f "/home/"${USER}"/lists/resolvers.txt*" ]; then
+ if [ -f "/home/${USER_EXEC}/lists/resolvers.txt*" ]; then
  	echo "resolvers.txt file exists"
  else
- 	mkdir /home/"${USER}"/lists/
- 	wget https://raw.githubusercontent.com/blechschmidt/massdns/master/lists/resolvers.txt -O /home/"${USER}"/lists/resolvers.txt
+ 	mkdir "/home/${USER_EXEC}/lists/"
+ 	wget https://raw.githubusercontent.com/blechschmidt/massdns/master/lists/resolvers.txt -O "/home/${USER_EXEC}/lists/resolvers.txt"
  fi
+
+echo $USER_EXEC
 
 # HERE'S THE PLACE FOR 'WHILE' STATEMENT
 while read -r domain; do
@@ -102,7 +108,7 @@ while read -r domain; do
 	bin=$dir/bin/${domain}
 	## Wappalyzer / Listing Technologies
 	https_link=$(echo "${domain}" | httprobe)
-	node /home/"${USER}"/tools/wappalyzer/src/drivers/npm/cli.js "$https_link" -P | jq '.technologies[].name' | tee "$bin"/"${domain}"_technologies.txt
+	node "/home/${USER_EXEC}/tools/wappalyzer/src/drivers/npm/cli.js" "$https_link" -P | jq '.technologies[].name' | tee "$bin"/"${domain}"_technologies.txt
 
 	## Crawling the website with hakrawler to find new roots, subdomain and javascript files
 
@@ -159,7 +165,7 @@ while read -r domain; do
 
 	#Small script to compare ${domain}_subdomains with alive to delete all alive lines that are in subdomains and pipe it to ${domain}_not_alive_subdomains.txt
 
-	cat "$bin"/"${domain}"_alive_subdomains.txt | tr -d "/" | cut -d ":" -f 2 | sort | uniq > "$bin"/"${domain}"_alive_subdomains_without_protocol.txt
+	cat  "$bin"/"${domain}"_alive_subdomains.txt | tr -d "/" | cut -d ":" -f 2 | sort | uniq > "$bin"/"${domain}"_alive_subdomains_without_protocol.txt
 
 	sdiff "$bin"/"${domain}"_subdomains.txt "$bin"/"${domain}"_alive_subdomains_without_protocol.txt | grep "<" | cut -d"<" -f1 | tr -d " " | tee "$bin"/tmp_"${domain}"_subdomains.txt && mv "$bin"/tmp_"${domain}"_subdomains.txt "$bin"/"${domain}"_subdomains.txt
 	
@@ -174,7 +180,7 @@ while read -r domain; do
 	# Port scanning not alive hosts
 
 
-	massdns --resolvers home/"${USER}"/lists/resolvers.txt -t AAAA "$bin"/"${domain}"_subdomains.txt -o J -w "${bin}"/"${domain}"_dns-resolved-ip.json
+	massdns --resolvers /home/"${USER_EXEC}"/lists/resolvers.txt --drop-user ${USER_EXEC} --drop-group ${USER_EXEC} -t AAAA "$bin"/"${domain}"_subdomains.txt -o J -w "${bin}"/"${domain}"_dns-resolved-ip.json
 	cat "${bin}"/"${domain}"_dns-resolved-ip.json | jq '. | "\(.resolver) \(.name)"' | tr " " "," | tr "\"" " " | tr -s " " | awk '$1=$1' >> "$bin"/"${domain}"_subdomains_ip.txt
 
 
@@ -183,10 +189,10 @@ while read -r domain; do
 	do
 		ip=$(echo "${line}" | awk -F"," '{print $1}')
 		subdomain=$(echo "${line}" | awk -F"," '{print $2}')
-		subdomain=$(echo "${"${subdomain}"%?}") # For some reason, without it there will be dot sign after .com e.g "subdomain.com."
+		subdomain=${subdomain%?} # For some reason, without it there will be dot sign after .com e.g "subdomain.com."
 		mkdir "$bin"/not_alive_"${subdomain}"
 
-		masscan "${ip}" -p0-65535 ––rate 1000 -oJ "${bin}"/not_alive_"${subdomain}"/masscan_grepable.json
+		masscan "${ip}" --ports 0-65535 ––rate 1000 -oJ "${bin}"/not_alive_"${subdomain}"/masscan_grepable.json
 
 
 
@@ -207,17 +213,17 @@ while read -r domain; do
 		
 		alive_subdomain_folder_name=$(echo "${alive_subdomain}" | tr / _ ) # Because in creation of directories, the '/' letter is not escaped we need to cut out only domain.com and get rid of 'https://'' 
 		
-		mkdir "${bin}"/alive_"${alive_subdomain_folder_name}" &
-		mkdir "${bin}"/alive_"${alive_subdomain_folder_name}"/"${alive_subdomain_folder_name}"_nuclei_op &
+		mkdir "${bin}"/alive_"${alive_subdomain_folder_name}" 
+		mkdir "${bin}"/alive_"${alive_subdomain_folder_name}"/"${alive_subdomain_folder_name}"_nuclei_op 
 
-		nuclei -target "${alive_subdomain}" -t "/home/"${USER}"/tools/nuclei-templates/cves/*.yaml" -c 60 -o  "$bin"/alive_"${alive_subdomain_folder_name}"/"${alive_subdomain_folder_name}"_nuclei_op/cves.txt &
-		nuclei -target "${alive_subdomain}" -t "/home/"${USER}"/tools/nuclei-templates/files/*.yaml" -c 60 -o  "$bin"/alive_"${alive_subdomain_folder_name}"/"${alive_subdomain_folder_name}"_nuclei_op/files.txt & 
-		nuclei -target "${alive_subdomain}" -t "/home/"${USER}"/tools/nuclei-templates/panels/*.yaml" -c 60 -o  "$bin"/alive_"${alive_subdomain_folder_name}"/"${alive_subdomain_folder_name}"_nuclei_op/panels.txt & 
-		nuclei -target "${alive_subdomain}" -t "/home/"${USER}"/tools/nuclei-templates/security-misconfiguration/*.yaml" -c 60 -o  "$bin"/alive_"${alive_subdomain_folder_name}"/"${alive_subdomain_folder_name}"_nuclei_op/security-misconfiguration.txt & 
-		nuclei -target "${alive_subdomain}" -t "/home/"${USER}"/tools/nuclei-templates/technologies/*.yaml" -c 60 -o  "$bin"/alive_"${alive_subdomain_folder_name}"/"${alive_subdomain_folder_name}"_nuclei_op/technologies.txt &
-		nuclei -target "${alive_subdomain}" -t "/home/"${USER}"/tools/nuclei-templates/tokens/*.yaml" -c 60 -o  "$bin"/alive_"${alive_subdomain_folder_name}"/"${alive_subdomain_folder_name}"_nuclei_op/tokens.txt &
-		nuclei -target "${alive_subdomain}" -t "/home/"${USER}"/tools/nuclei-templates/vulnerabilities/*.yaml" -c 60 -o  "$bin"/alive_"${alive_subdomain_folder_name}"/"${alive_subdomain_folder_name}"_nuclei_op/vulnerabilities.txt & 
-		nuclei -target "${alive_subdomain}" -t "/home/"${USER}"/tools/nuclei-templates/subdomain-takeover/*.yaml" -c 60 -o  "$bin"/alive_"${alive_subdomain_folder_name}"/"${alive_subdomain_folder_name}"_nuclei_op/subdomain-takeover.txt &
+		nuclei -target "${alive_subdomain}" -t "/home/${USER_EXEC}/tools/nuclei-templates/cves/*.yaml" -c 60 -o  "$bin"/alive_"${alive_subdomain_folder_name}"/"${alive_subdomain_folder_name}"_nuclei_op/cves.txt &
+		nuclei -target "${alive_subdomain}" -t "/home/${USER_EXEC}/tools/nuclei-templates/files/*.yaml" -c 60 -o  "$bin"/alive_"${alive_subdomain_folder_name}"/"${alive_subdomain_folder_name}"_nuclei_op/files.txt & 
+		nuclei -target "${alive_subdomain}" -t "/home/${USER_EXEC}/tools/nuclei-templates/panels/*.yaml" -c 60 -o  "$bin"/alive_"${alive_subdomain_folder_name}"/"${alive_subdomain_folder_name}"_nuclei_op/panels.txt & 
+		nuclei -target "${alive_subdomain}" -t "/home/${USER_EXEC}/tools/nuclei-templates/security-misconfiguration/*.yaml" -c 60 -o  "$bin"/alive_"${alive_subdomain_folder_name}"/"${alive_subdomain_folder_name}"_nuclei_op/security-misconfiguration.txt & 
+		nuclei -target "${alive_subdomain}" -t "/home/${USER_EXEC}/tools/nuclei-templates/technologies/*.yaml" -c 60 -o  "$bin"/alive_"${alive_subdomain_folder_name}"/"${alive_subdomain_folder_name}"_nuclei_op/technologies.txt &
+		nuclei -target "${alive_subdomain}" -t "/home/${USER_EXEC}/tools/nuclei-templates/tokens/*.yaml" -c 60 -o  "$bin"/alive_"${alive_subdomain_folder_name}"/"${alive_subdomain_folder_name}"_nuclei_op/tokens.txt &
+		nuclei -target "${alive_subdomain}" -t "/home/${USER_EXEC}/tools/nuclei-templates/vulnerabilities/*.yaml" -c 60 -o  "$bin"/alive_"${alive_subdomain_folder_name}"/"${alive_subdomain_folder_name}"_nuclei_op/vulnerabilities.txt & 
+		nuclei -target "${alive_subdomain}" -t "/home/${USER_EXEC}/tools/nuclei-templates/subdomain-takeover/*.yaml" -c 60 -o  "$bin"/alive_"${alive_subdomain_folder_name}"/"${alive_subdomain_folder_name}"_nuclei_op/subdomain-takeover.txt &
 		wait
 	done
 	
@@ -255,7 +261,8 @@ while read -r domain; do
 		                        URL="https://${x}${end_point}"
 		                fi
 		                file=$(basename "${end_point}")
-		                curl -X GET "${URL}" -L | js-beautify | tee "${bin}/javascript_work/scriptsresponse/${x}/${file}"
+		                curl -X GET "${URL}" -L  | tee "${bin}/javascript_work/scriptsresponse/${x}/${file}"
+		                js-beautify -f "${bin}/javascript_work/scriptsresponse/${x}/${file}" -o "${bin}/javascript_work/scriptsresponse/${x}/${file}"
 		                echo "${URL}" |  sed  's/http:__//' | sed  's/https:__//' | tee -a "${bin}/javascript_work/scripts/${x}"
 		        done
 		done
@@ -270,3 +277,4 @@ while read -r domain; do
 	bin=${dir}/bin
 
 done < "${bin}"/roots.txt
+chown -R "${USER_EXEC}":"${USER_EXEC}" "${domain}"
