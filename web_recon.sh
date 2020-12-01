@@ -42,17 +42,12 @@ while getopts d:a:u: OPTION; do
 	esac
 done
 
-echo ${USER_EXEC}
-
  if [ -z "${USER_EXEC}" ]; then
  	echo "You did not passed another ${USER} account, executing as root user"
  	USER_EXEC=root
  else
  	echo "You passed another ${USER} account"
  fi
-
-dirsearchWordlist=/home/"${USER_EXEC}"/tools/dirsearch/db/dicc.txt
-massdnsWordlist=/home/"${USER_EXEC}"/tools/SecLists/Discovery/DNS/clean-jhaddix-dns.txt
 
 mkdir "${domain}"
 if [ -f "./${domain}/Acquisitions.txt" ];then
@@ -75,7 +70,7 @@ mkdir -p "${domain}"/bin
 dir=$PWD/${domain}
 bin=$dir/bin
 ## ASN Enumeration
- if [ -z ${ASN} ]; then
+ if [ -z "${ASN}" ]; then
 	echo 'You did not supplied ASN number'
 	touch "${bin}"/roots.txt # Making empty file
 	echo "${domain}" >> "${bin}"/roots.txt
@@ -99,8 +94,6 @@ bin=$dir/bin
  	mkdir "/home/${USER_EXEC}/lists/"
  	wget https://raw.githubusercontent.com/blechschmidt/massdns/master/lists/resolvers.txt -O "/home/${USER_EXEC}/lists/resolvers.txt"
  fi
-
-echo $USER_EXEC
 
 # HERE'S THE PLACE FOR 'WHILE' STATEMENT
 while read -r domain; do
@@ -157,31 +150,29 @@ while read -r domain; do
 	wait
 	cat "$bin"/"${domain}"_subdomain_bruting_amass.txt >> "$bin"/"${domain}"_subdomains.txt
 
-	cat "$bin"/"${domain}"_subdomains.txt | sort | uniq | tee -a "$bin"/tmp_"${domain}"_subdomains.txt && mv "$bin"/tmp_"${domain}"_subdomains.txt "$bin"/"${domain}"_subdomains.txt
+	sort "$bin"/"${domain}"_subdomains.txt | uniq | tee -a "$bin"/tmp_"${domain}"_subdomains.txt && mv "$bin"/tmp_"${domain}"_subdomains.txt "$bin"/"${domain}"_subdomains.txt
 
-	cat "$bin"/"${domain}"_subdomains.txt | httprobe | tee  -a "$bin"/"${domain}"_alive_subdomains.txt
+	 <"$bin"/"${domain}"_subdomains.txt httprobe | tee  -a "$bin"/"${domain}"_alive_subdomains.txt
 
 
 
 	#Small script to compare ${domain}_subdomains with alive to delete all alive lines that are in subdomains and pipe it to ${domain}_not_alive_subdomains.txt
 
-	cat  "$bin"/"${domain}"_alive_subdomains.txt | tr -d "/" | cut -d ":" -f 2 | sort | uniq > "$bin"/"${domain}"_alive_subdomains_without_protocol.txt
+	<"$bin"/"${domain}"_alive_subdomains.txt tr -d "/" | cut -d ":" -f 2 | sort | uniq > "$bin"/"${domain}"_alive_subdomains_without_protocol.txt
 
 	sdiff "$bin"/"${domain}"_subdomains.txt "$bin"/"${domain}"_alive_subdomains_without_protocol.txt | grep "<" | cut -d"<" -f1 | tr -d " " | tee "$bin"/tmp_"${domain}"_subdomains.txt && mv "$bin"/tmp_"${domain}"_subdomains.txt "$bin"/"${domain}"_subdomains.txt
 	
-	#grep -v -x -f "$bin"/"${domain}"_subdomains.txt "$bin"/"${domain}"_alive_subdomains_without_protocol.txt | tee "$bin"/tmp_"${domain}"_subdomains.txt && mv "$bin"/tmp_"${domain}"_subdomains.txt "$bin"/"${domain}"_subdomains.txt
 
 
-
-	#rm "$bin"/"${domain}"_alive_subdomains_without_protocol.txt
+	rm "$bin"/"${domain}"_alive_subdomains_without_protocol.txt
 
 	# Favfreak
-	cat "$bin"/"${domain}"_alive_subdomains.txt | favfreak.py -o "$bin"/"${domain}"_favfreak
+	<"$bin"/"${domain}"_alive_subdomains.txt favfreak.py -o "$bin"/"${domain}"_favfreak
 	# Port scanning not alive hosts
 
 
 	massdns --resolvers /home/"${USER_EXEC}"/lists/resolvers.txt --drop-user ${USER_EXEC} --drop-group ${USER_EXEC} -t AAAA "$bin"/"${domain}"_subdomains.txt -o J -w "${bin}"/"${domain}"_dns-resolved-ip.json
-	cat "${bin}"/"${domain}"_dns-resolved-ip.json | jq '. | "\(.resolver) \(.name)"' | tr " " "," | tr "\"" " " | tr -s " " | awk '$1=$1' >> "$bin"/"${domain}"_subdomains_ip.txt
+	<"${bin}"/"${domain}"_dns-resolved-ip.json  jq '. | "\(.resolver) \(.name)"' | tr " " "," | tr "\"" " " | tr -s " " | awk '$1=$1' >> "$bin"/"${domain}"_subdomains_ip.txt
 
 
 
@@ -204,7 +195,7 @@ while read -r domain; do
 		#brutespray -f $bin/not_alive_${subdomain}/${domain}_${subdomain}_nmap.txt -o $bin/not_alive_${subdomain}/${domain}_${subdomain}_brutespray
 
 
-	done < "$bin"/"${domain}"_subdomains_ip.txt
+	done < ${bin}/${domain}_subdomains_ip.txt
 
 	wait
 
@@ -250,12 +241,12 @@ while read -r domain; do
 		jsfinder(){
 		echo "Gathering JS Files"       
 		for x in $(ls "${bin}/javascript_work/responsebody"); do
-		        printf "\n\n${RED}${x}${NC}\n\n"
-		        END_POINTS=$(cat "${bin}/javascript_work/responsebody/${x}" | grep -Eoi "src=\"[^>]+></script>" | cut -d '"' -f 2)
+		        echo -e "\n\n${RED}${x}${NC}\n\n"
+		        END_POINTS=$( <"${bin}/javascript_work/responsebody/${x}"  grep -Eoi "src=\"[^>]+></script>" | cut -d '"' -f 2)
 		        for end_point in $END_POINTS; do
 		                len=$(echo "${end_point}" | grep "http" | wc -c)
 		                mkdir "${bin}/javascript_work/scriptsresponse/$x/" > /dev/null 2>&1
-		                URL=$(echo "${end_point}")
+		                URL=${end_point}
 		                if [ "${len}" == 0 ]
 		                then
 		                        URL="https://${x}${end_point}"
@@ -277,4 +268,4 @@ while read -r domain; do
 	bin=${dir}/bin
 
 done < "${bin}"/roots.txt
-chown -R "${USER_EXEC}":"${USER_EXEC}" "${domain}"
+chown -R "${USER_EXEC}" "${domain}"
