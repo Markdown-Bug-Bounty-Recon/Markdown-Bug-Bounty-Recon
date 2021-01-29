@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# THIS SCRIPT SERVES ONLY AS A HELP IN DECENTRALIZING IT.
+: '
 usage(){
 
 	echo "Usage: $0 [-d DOMAIN]" >&2
@@ -158,7 +160,7 @@ while read -r domain; do
 
 	<"$bin"/"${domain}"_alive_subdomains.txt tr -d "/" | cut -d ":" -f 2 | sort | uniq > "$bin"/"${domain}"_alive_subdomains_without_protocol.txt
 
-	sdiff "$bin"/"${domain}"_subdomains.txt "$bin"/"${domain}"_alive_subdomains_without_protocol.txt | grep "<" | cut -d"<" -f1 | tr -d " " | tee "$bin"/tmp_"${domain}"_subdomains.txt && mv "$bin"/tmp_"${domain}"_subdomains.txt "$bin"/"${domain}"_subdomains.txt
+	sdiff "$bin"/"${domain}"_subdomains.txt "$bin"/"${domain}"_alive_subdomains_without_protocol.txt | grep "<" | cut -d"<" -f1 | tr -d  | tee "$bin"/tmp_"${domain}"_subdomains.txt && mv "$bin"/tmp_"${domain}"_subdomains.txt "$bin"/"${domain}"_subdomains.txt
 
 
 
@@ -266,3 +268,4 @@ while read -r domain; do
 
 done < "${bin}"/roots.txt
 chown -R "${USER_EXEC}" "${domain}"
+'

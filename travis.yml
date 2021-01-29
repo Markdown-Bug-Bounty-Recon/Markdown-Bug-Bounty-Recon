@@ -1,3 +1,4 @@
+language: bash
 script:
   # Fail if any of these files have warnings
-  - shellcheck myscripts/*.sh
+  - shellcheck ./*.sh
