@@ -87,7 +87,6 @@ bin=$dir/bin
 
   sort "${bin}"/roots.txt | uniq | tee "${bin}"/tmp_roots.txt && mv "${bin}"/tmp_roots.txt "${bin}"/roots.txt
 
-# Getting resolvers for massdns ( we later use this )
  if [ -f "/home/${USER_EXEC}/lists/resolvers.txt*" ]; then
  	echo "resolvers.txt file exists"
  else
@@ -107,9 +106,9 @@ while read -r domain; do
 
 	hakrawler -url "${domain}" -depth 2 -js -plain | tee "$bin"/"${domain}"_javascript_files.txt &
 
-	hakrawler -url "${domain}" -depth 1 -subs -usewayback -plain | tee -a "$bin"/"${domain}"_subdomains.txt 
+	hakrawler -url "${domain}" -depth 1 -subs -usewayback -plain | tee -a "$bin"/"${domain}"_subdomains.txt
 	wait
-	sed -i 's/www.//' "$bin"/"${domain}"_subdomains.txt # Some of the output from hakrawler begin with 'www.' to make this output uniform we're using sed on it 
+	sed -i 's/www.//' "$bin"/"${domain}"_subdomains.txt # Some of the output from hakrawler begin with 'www.' to make this output uniform we're using sed on it
 
 
 	## Analyzing Javascript with SubDomainizer and subscraper
@@ -123,10 +122,10 @@ while read -r domain; do
 	wait
 
 	# Fetching the final results
-	cat "$bin"/"${domain}"_subdomains_amass.txt >> "$bin"/"${domain}"_subdomains.txt & 
+	cat "$bin"/"${domain}"_subdomains_amass.txt >> "$bin"/"${domain}"_subdomains.txt &
     cat "$bin"/"${domain}"_subdomains_subfinder.txt >> "$bin"/"${domain}"_subdomains.txt &
 	cat "$bin"/"${domain}"_subdomains_cloud.txt >> "$bin"/"${domain}"_subdomains.txt &
-	cat "$bin"/"${domain}"_subdomains_subdomainizer.txt >> "$bin"/"${domain}"_subdomains.txt & 
+	cat "$bin"/"${domain}"_subdomains_subdomainizer.txt >> "$bin"/"${domain}"_subdomains.txt &
 	wait
 	#Deleting the unnecessary
 	rm "$bin"/"${domain}"_subdomains_amass.txt &
@@ -136,19 +135,18 @@ while read -r domain; do
 	wait
 	# Checking if these subdomains are alive
 
-	sort "$bin"/"${domain}"_subdomains.txt | uniq | tee "$bin"/tmp_"${domain}"_subdomains.txt && mv "$bin"/tmp_"${domain}"_subdomains.txt "$bin"/"${domain}"_subdomains.txt 
 
 	# Another while loop here for subdomains bruting with hyper-processing
-	
-	touch "$bin"/"${domain}"_subdomain_bruting_amass.txt 
+
+#	touch "$bin"/"${domain}"_subdomain_bruting_amass.txt
 	#while read -r subdomain;
 	#do
 	#	amass enum -brute -d "${subdomain}" -src -o "$bin"/"${domain}"_subdomain_bruting_amass.txt &
-	#done < "$bin"/"${domain}"_subdomains.txt 
-	
+	#done < "$bin"/"${domain}"_subdomains.txt
 
-	wait
-	cat "$bin"/"${domain}"_subdomain_bruting_amass.txt >> "$bin"/"${domain}"_subdomains.txt
+
+#	wait
+#	cat "$bin"/"${domain}"_subdomain_bruting_amass.txt >> "$bin"/"${domain}"_subdomains.txt
 
 	sort "$bin"/"${domain}"_subdomains.txt | uniq | tee -a "$bin"/tmp_"${domain}"_subdomains.txt && mv "$bin"/tmp_"${domain}"_subdomains.txt "$bin"/"${domain}"_subdomains.txt
 
@@ -161,10 +159,9 @@ while read -r domain; do
 	<"$bin"/"${domain}"_alive_subdomains.txt tr -d "/" | cut -d ":" -f 2 | sort | uniq > "$bin"/"${domain}"_alive_subdomains_without_protocol.txt
 
 	sdiff "$bin"/"${domain}"_subdomains.txt "$bin"/"${domain}"_alive_subdomains_without_protocol.txt | grep "<" | cut -d"<" -f1 | tr -d " " | tee "$bin"/tmp_"${domain}"_subdomains.txt && mv "$bin"/tmp_"${domain}"_subdomains.txt "$bin"/"${domain}"_subdomains.txt
-	
 
 
-	rm "$bin"/"${domain}"_alive_subdomains_without_protocol.txt
+
 
 	# Favfreak
 	<"$bin"/"${domain}"_alive_subdomains.txt favfreak.py -o "$bin"/"${domain}"_favfreak
@@ -176,19 +173,19 @@ while read -r domain; do
 
 
 
-	while read -r line; 
+	while read -r line;
 	do
 		ip=$(echo "${line}" | awk -F"," '{print $1}')
 		subdomain=$(echo "${line}" | awk -F"," '{print $2}')
 		subdomain=${subdomain%?} # For some reason, without it there will be dot sign after .com e.g "subdomain.com."
 		mkdir "$bin"/not_alive_"${subdomain}"
 
-		masscan "${ip}" --ports 0-65535 ––rate 1000 -oJ "${bin}"/not_alive_"${subdomain}"/masscan_grepable.json
+		masscan "${ip}" --ports 0-65535 ––rate 1000 -oX "${bin}"/not_alive_"${subdomain}"/masscan_grepable.json
 
 
 
 		# NMAP SCAN WITH -oG flag output
-		
+
 		# nmap -T4 -A -p- -Pn -oN "${bin}"/not_alive_"${subdomain}"/nmap-results.txt -oX "${bin}"/not_alive_"${subdomain}"/nmap-results.xml $subdomain
 
 		# ----------------
@@ -201,23 +198,23 @@ while read -r domain; do
 
 	for alive_subdomain in $(cat "${bin}"/"${domain}"_alive_subdomains.txt)
 	do
-		
-		alive_subdomain_folder_name=$(echo "${alive_subdomain}" | tr / _ ) # Because in creation of directories, the '/' letter is not escaped we need to cut out only domain.com and get rid of 'https://'' 
-		
-		mkdir "${bin}"/alive_"${alive_subdomain_folder_name}" 
-		mkdir "${bin}"/alive_"${alive_subdomain_folder_name}"/"${alive_subdomain_folder_name}"_nuclei_op 
+
+		alive_subdomain_folder_name=$(echo "${alive_subdomain}" | tr / _ ) # Because in creation of directories, the '/' letter is not escaped we need to cut out only domain.com and get rid of 'https://''
+
+		mkdir "${bin}"/alive_"${alive_subdomain_folder_name}"
+		mkdir "${bin}"/alive_"${alive_subdomain_folder_name}"/"${alive_subdomain_folder_name}"_nuclei_op
 
 		nuclei -target "${alive_subdomain}" -t "/home/${USER_EXEC}/tools/nuclei-templates/cves/*.yaml" -c 60 -o  "$bin"/alive_"${alive_subdomain_folder_name}"/"${alive_subdomain_folder_name}"_nuclei_op/cves.txt &
-		nuclei -target "${alive_subdomain}" -t "/home/${USER_EXEC}/tools/nuclei-templates/files/*.yaml" -c 60 -o  "$bin"/alive_"${alive_subdomain_folder_name}"/"${alive_subdomain_folder_name}"_nuclei_op/files.txt & 
-		nuclei -target "${alive_subdomain}" -t "/home/${USER_EXEC}/tools/nuclei-templates/panels/*.yaml" -c 60 -o  "$bin"/alive_"${alive_subdomain_folder_name}"/"${alive_subdomain_folder_name}"_nuclei_op/panels.txt & 
-		nuclei -target "${alive_subdomain}" -t "/home/${USER_EXEC}/tools/nuclei-templates/security-misconfiguration/*.yaml" -c 60 -o  "$bin"/alive_"${alive_subdomain_folder_name}"/"${alive_subdomain_folder_name}"_nuclei_op/security-misconfiguration.txt & 
+		nuclei -target "${alive_subdomain}" -t "/home/${USER_EXEC}/tools/nuclei-templates/files/*.yaml" -c 60 -o  "$bin"/alive_"${alive_subdomain_folder_name}"/"${alive_subdomain_folder_name}"_nuclei_op/files.txt &
+		nuclei -target "${alive_subdomain}" -t "/home/${USER_EXEC}/tools/nuclei-templates/panels/*.yaml" -c 60 -o  "$bin"/alive_"${alive_subdomain_folder_name}"/"${alive_subdomain_folder_name}"_nuclei_op/panels.txt &
+		nuclei -target "${alive_subdomain}" -t "/home/${USER_EXEC}/tools/nuclei-templates/security-misconfiguration/*.yaml" -c 60 -o  "$bin"/alive_"${alive_subdomain_folder_name}"/"${alive_subdomain_folder_name}"_nuclei_op/security-misconfiguration.txt &
 		nuclei -target "${alive_subdomain}" -t "/home/${USER_EXEC}/tools/nuclei-templates/technologies/*.yaml" -c 60 -o  "$bin"/alive_"${alive_subdomain_folder_name}"/"${alive_subdomain_folder_name}"_nuclei_op/technologies.txt &
 		nuclei -target "${alive_subdomain}" -t "/home/${USER_EXEC}/tools/nuclei-templates/tokens/*.yaml" -c 60 -o  "$bin"/alive_"${alive_subdomain_folder_name}"/"${alive_subdomain_folder_name}"_nuclei_op/tokens.txt &
-		nuclei -target "${alive_subdomain}" -t "/home/${USER_EXEC}/tools/nuclei-templates/vulnerabilities/*.yaml" -c 60 -o  "$bin"/alive_"${alive_subdomain_folder_name}"/"${alive_subdomain_folder_name}"_nuclei_op/vulnerabilities.txt & 
+		nuclei -target "${alive_subdomain}" -t "/home/${USER_EXEC}/tools/nuclei-templates/vulnerabilities/*.yaml" -c 60 -o  "$bin"/alive_"${alive_subdomain_folder_name}"/"${alive_subdomain_folder_name}"_nuclei_op/vulnerabilities.txt &
 		nuclei -target "${alive_subdomain}" -t "/home/${USER_EXEC}/tools/nuclei-templates/subdomain-takeover/*.yaml" -c 60 -o  "$bin"/alive_"${alive_subdomain_folder_name}"/"${alive_subdomain_folder_name}"_nuclei_op/subdomain-takeover.txt &
 		wait
 	done
-	
+
 	# Javascript work
 
 	mkdir -p "${bin}"/javascript_work/scripts &
@@ -230,16 +227,16 @@ while read -r domain; do
 	jsep()
 {
 		response(){
-		echo "Gathering Response"       
+		echo "Gathering Response"
 		        while read -r x; do
 		        NAME=$(echo "$x" | tr / _ )
-		        curl -X GET -H "X-Forwarded-For: evil.com" "$x" -I | tee -a "${bin}/javascript_work/headers/$NAME" 
+		        curl -X GET -H "X-Forwarded-For: evil.com" "$x" -I | tee -a "${bin}/javascript_work/headers/$NAME"
 		        curl -s -X GET -H "X-Forwarded-For: evil.com" -L "$x" |tee -a "${bin}/javascript_work/responsebody/$NAME"
 		done < "${bin}"/"${domain}"_alive_subdomains.txt
 		}
 
 		jsfinder(){
-		echo "Gathering JS Files"       
+		echo "Gathering JS Files"
 		for x in $(ls "${bin}/javascript_work/responsebody"); do
 		        echo -e "\n\n${RED}${x}${NC}\n\n"
 		        END_POINTS=$( <"${bin}/javascript_work/responsebody/${x}"  grep -Eoi "src=\"[^>]+></script>" | cut -d '"' -f 2)
