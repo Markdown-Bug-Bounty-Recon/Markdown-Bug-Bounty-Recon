@@ -42,9 +42,9 @@ while getopts d:a:u: OPTION; do
 	esac
 done
 
-initialization.sh -d $domain -a $ASN -u $USER_EXEC
-get-subdomains.sh -d $domain -a $ASN -u $USER_EXEC
-get-alive-subdomains.sh -d $domain -a $ASN -u $USER_EXEC
-get-not-alive-subdomains-ip.sh -d $domain -a $ASN -u $USER_EXEC
-bruting-not-alive-subdomains.sh -d $domain -a $ASN -u $USER_EXEC
-bruting-alive-subdomains.sh -d $domain -a $ASN -u $USER_EXEC
+initialization.sh -d "$domain" -a "$ASN" -u "$USER_EXEC"
+get-subdomains.sh -d "$domain" -a "$ASN" -u "$USER_EXEC"
+get-alive-subdomains.sh -d "$domain" -a "$ASN" -u "$USER_EXEC"
+get-not-alive-subdomains-ip.sh -d "$domain" -a "$ASN" -u "$USER_EXEC"
+bruting-not-alive-subdomains.sh -d "$domain" -a "$ASN" -u "$USER_EXEC"
+bruting-alive-subdomains.sh -d "$domain" -a "$ASN" -u "$USER_EXEC"

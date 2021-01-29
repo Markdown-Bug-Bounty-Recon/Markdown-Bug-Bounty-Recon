@@ -60,7 +60,7 @@ function yes_or_no {
  fi
 
 mkdir "${domain}"
-if [ -f ./${domain}/scope.txt];
+if [ -f ./${domain}/scope.txt ];
 then
   echo "DECLARING SCOPE OF YOUR PROGRAM"
   echo "Do you want to declare it? [Y/N]"
@@ -71,7 +71,7 @@ then
   fi
 fi
 
-if [ -f ./${domain}/out-of-scope.txt];
+if [ -f ./${domain}/out-of-scope.txt ];
 then
   echo "DECLARING SCOPE OF YOUR PROGRAM"
   echo "Do you want to declare it? [Y/N]"
@@ -95,4 +95,4 @@ else
 	echo "Do you want to create Acquisitions.txt file to include"
 fi
 
-sort "${bin}"/roots.txt | uniq | tee "${bin}"/tmp_roots.txt && mv "${bin}"/tmp_roots.txt "${bin}"/roots.txt
+sort "${bin}"/roots.txt | uniq | tee ${bin}/tmp_roots.txt && mv "${bin}"/tmp_roots.txt "${bin}"/roots.txt
