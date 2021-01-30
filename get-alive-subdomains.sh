@@ -30,9 +30,6 @@ while getopts d:a:u: OPTION; do
 		d)
 		domain="$OPTARG"
 		;;
-		a)
-		ASN="$OPTARG"
-		;;
 		u)
 		USER_EXEC="$OPTARG"
 		;;
@@ -96,7 +93,7 @@ done
 
 
  mkdir "${domain}"
- LAST_INIT_DATE=$(cat "$PWD"/"${domain}"/last-init-date.sh)
+ LAST_INIT_DATE=$(cat "$PWD"/"${domain}"/last-init-date.txt)
  mkdir -p "${domain}"/"${LAST_INIT_DATE}"/tools-io
  dir=$PWD/${domain}/${LAST_INIT_DATE}
  bin=$dir/tools-io

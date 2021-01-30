@@ -63,8 +63,7 @@ mkdir "${domain}"
 if [ -f ./${domain}/scope.txt ];
 then
   echo "DECLARING SCOPE OF YOUR PROGRAM"
-  echo "Do you want to declare it? [Y/N]"
-  yes_or_no
+  yes_or_no "Do you want to declare it? [Y/N]"
   if [ $? -eq 0 ];
   then
     vim ./${domain}/scope.txt
@@ -74,8 +73,7 @@ fi
 if [ -f ./${domain}/out-of-scope.txt ];
 then
   echo "DECLARING SCOPE OF YOUR PROGRAM"
-  echo "Do you want to declare it? [Y/N]"
-  yes_or_no
+  yes_or_no "Do you want to declare it? [Y/N]"
   if [ $? -eq 0 ];
   then
     vim ./${domain}/out-of-scope.txt
@@ -84,10 +82,12 @@ fi
 
 
 CURRENTDATE=`date +"%Y-%m-%d"`
-echo $CURRENTDATE > $PWD/${domain}/last-init-date.sh
+echo $CURRENTDATE > $PWD/${domain}/last-init-date.txt
 mkdir -p "${domain}"/${CURRENTDATE}/tools-io
 dir=$PWD/${domain}/${CURRENTDATE}
 bin=$dir/tools-io
+
+echo "${ASN}" > ./${domain}/asn.txt
 
 if [ -f "./${domain}/Acquisitions.txt" ];then
 	echo "There's already text file for Acquisitions"

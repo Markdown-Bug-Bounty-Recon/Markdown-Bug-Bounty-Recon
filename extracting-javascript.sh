@@ -49,51 +49,85 @@ done
 
 
  mkdir "${domain}"
- LAST_INIT_DATE=$(cat "$PWD"/"${domain}"/last-init-date.sh)
+ LAST_INIT_DATE=$(cat "$PWD"/"${domain}"/last-init-date.txt)
  mkdir -p "${domain}"/"${LAST_INIT_DATE}"/tools-io
  dir=$PWD/${domain}/${LAST_INIT_DATE}
  bin=$dir/tools-io
 
 mkdir -p "${bin}"/javascript_work/scripts &
-mkdir -p "${bin}"/javascript_work/scriptsresponse &
 mkdir -p "${bin}"/javascript_work/endpoints &
-mkdir -p "${bin}"/javascript_work/responsebody &
-mkdir -p "${bin}"/javascript_work/headers &
+mkdir -p "${bin}"/javascript_work/no-endpoints &
+mkdir -p "${bin}"/javascript_work/output &
+mkdir -p "${bin}"/javascript_work/script-links &
+
+
 wait
+while read -r alive_subdomain; do
+	alive_subdomain_folder_name=$(echo "${alive_subdomain}" | tr / _ ) # Because in creation of directories, the '/' letter is not escaped we need to cut out only domain.com and get rid of 'https://''
 
-jsep()
-{
-  response(){
-  echo "Gathering Response"
-          while read -r x; do
-          NAME=$(echo "$x" | tr / _ )
-          curl -X GET -H "X-Forwarded-For: evil.com" "$x" -I | tee -a "${bin}/javascript_work/headers/$NAME"
-          curl -s -X GET -H "X-Forwarded-For: evil.com" -L "$x" |tee -a "${bin}/javascript_work/responsebody/$NAME"
-  done < "${bin}"/"${domain}"_alive_subdomains.txt
-  }
+	bin=$dir/tools-io/not_alive_"${alive_subdomain_folder_name}"/javascript_work/
+	gau "${alive_subdomain}" |grep -iE '\.js'|grep -ivE '\.json'|sort -u  >> "${bin}"/scripts/"${alive_subdomain}"JS.txt
+	cat "${bin}"/scripts/"${alive_subdomain}"JS.txt | xargs -n2 -I@ bash -c "echo -e '\n[URL]: @\n';linkfinder.py -i @ -o cli" >> "${bin}"/endpoints/"${alive_subdomain}"PathsWithUrl.txt
+	cat "${bin}"/endpoints/"${alive_subdomain}"PathsWithUrl.txt |grep -iv '[URL]:'||sort -u > "${bin}"/no-endpoints/"${alive_subdomain}"/paypalJSPathsNoUrl.txt
+	cat "${bin}"/no-endpoints/"${alive_subdomain}"/"${alive_subdomain}"JSPathsNoUrl.txt | python3 collector.py "${bin}"/output/"${alive_subdomain}"_output
 
-  jsfinder(){
-  echo "Gathering JS Files"
-  for x in $(ls "${bin}/javascript_work/responsebody"); do
-          echo -e "\n\n${RED}${x}${NC}\n\n"
-          END_POINTS=$( <"${bin}/javascript_work/responsebody/${x}"  grep -Eoi "src=\"[^>]+></script>" | cut -d '"' -f 2)
-          for end_point in $END_POINTS; do
-                  len=$(echo "${end_point}" | grep "http" | wc -c)
-                  mkdir "${bin}/javascript_work/scriptsresponse/$x/" > /dev/null 2>&1
-                  URL=${end_point}
-                  if [ "${len}" == 0 ]
-                  then
-                          URL="https://${x}${end_point}"
-                  fi
-                  file=$(basename "${end_point}")
-                  curl -X GET "${URL}" -L  | tee "${bin}/javascript_work/scriptsresponse/${x}/${file}"
-                  js-beautify -f "${bin}/javascript_work/scriptsresponse/${x}/${file}" -o "${bin}/javascript_work/scriptsresponse/${x}/${file}"
-                  echo "${URL}" |  sed  's/http:__//' | sed  's/https:__//' | tee -a "${bin}/javascript_work/scripts/${x}"
-          done
-  done
-  }
-  response
-  jsfinder
+	getsrc "${alive_subdomain}" >> "${bin}"/script-links/"${alive_subdomain}"_output
+	cat "${bin}"/scripts/"${alive_subdomain}"JS.txt | xargs -n2 -I @ bash -c 'echo -e "\n[URL] @\n";python3 linkfinder.py -i @ -o cli' >> "${bin}"/secrets/"${alive_subdomain}"JSSecrets.txt
 
-  }
-jsep
+	ffuf -u https://www.paypalobjects.com/js/ -w /home/penelope/SecLists/Javascript-URLs/js-wordlist.txt -t 200 >> "${bin}"/endpoints/"${alive_subdomain}"PathsWithUrl.txt
+
+
+done < "$bin"/"${domain}"_alive_subdomains.txt
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#jsep()
+#{
+#  response(){
+#  echo "Gathering Response"
+#          while read -r x; do
+#          NAME=$(echo "$x" | tr / _ )
+#          curl -X GET -H "X-Forwarded-For: evil.com" "$x" -I | tee -a "${bin}/javascript_work/headers/$NAME"
+#          curl -s -X GET -H "X-Forwarded-For: evil.com" -L "$x" |tee -a "${bin}/javascript_work/responsebody/$NAME"
+#  done < "${bin}"/"${domain}"_alive_subdomains.txt
+#  }
+#
+#  jsfinder(){
+#  echo "Gathering JS Files"
+#  for x in ${bin}/javascript_work/responsebody/; do
+#          echo -e "\n\n${RED}${x}${NC}\n\n"
+#          END_POINTS=$( <"${bin}/javascript_work/responsebody/${x}"  grep -Eoi "src=\"[^>]+></script>" | cut -d '"' -f 2)
+#          for end_point in $END_POINTS; do
+#                  len=$(echo "${end_point}" | grep "http" | wc -c)
+#                  mkdir "${bin}/javascript_work/scriptsresponse/$x/" > /dev/null 2>&1
+#                  URL=${end_point}
+#                  if [ "${len}" == 0 ]
+#                  then
+#                          URL="https://${x}${end_point}"
+#                  fi
+#                  file=$(basename "${end_point}")
+#                  curl -X GET "${URL}" -L  | tee "${bin}/javascript_work/scriptsresponse/${x}/${file}"
+#                  js-beautify -f "${bin}/javascript_work/scriptsresponse/${x}/${file}" -o "${bin}/javascript_work/scriptsresponse/${x}/${file}"
+#                  echo "${URL}" |  sed  's/http:__//' | sed  's/https:__//' | tee -a "${bin}/javascript_work/scripts/${x}"
+#          done
+#  done
+#  }
+#  response
+#  jsfinder
+
+#  }
+#jsep

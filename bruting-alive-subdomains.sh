@@ -48,7 +48,7 @@ done
  fi
 
  mkdir "${domain}"
- LAST_INIT_DATE=$(cat "$PWD"/"${domain}"/last-init-date.sh)
+ LAST_INIT_DATE=$(cat "$PWD"/"${domain}"/last-init-date.txt)
  mkdir -p "${domain}"/"${LAST_INIT_DATE}"/tools-io
  dir=$PWD/${domain}/${LAST_INIT_DATE}
  bin=$dir/tools-io

@@ -23,7 +23,7 @@ cp ${bin}/${domain}_alive_subdomains.txt ${markdown_dir}
 sed -i "s/^/- [ ] /" ${markdown_dir}/${domain}_alive_subdomains.txt
 mv ${markdown_dir}/${domain}_alive_subdomains.txt ${markdown_dir}/${domain}_alive_subdomains.mdpp
 
-cp ${bin}/${domain}_subdomains.txt ${markdown_dir}	
+cp ${bin}/${domain}_subdomains.txt ${markdown_dir}
 sed -i "s/^/- [ ] /" ${markdown_dir}/${domain}_subdomains.txt
 mv ${markdown_dir}/${domain}_subdomains.txt ${markdown_dir}/${domain}_subdomains.mdpp
 
@@ -37,7 +37,7 @@ echo "## SUBDOMAINS OVERVIEW" >> ${markdown_dir}/alive_${alive_subdomain_folder_
 
 
 	for alive_subdomain in $(cat ${bin}/${domain}_alive_subdomains.txt); do
-		
+
 		alive_subdomain_folder_name=$(echo ${alive_subdomain} | tr / _) # Because in creation of directories, the '/' letter is not escaped we need to cut out only domain.com and get rid of 'https://''
 
 		mkdir -p ${markdown_dir}/alive_${alive_subdomain_folder_name}
@@ -45,25 +45,25 @@ echo "## SUBDOMAINS OVERVIEW" >> ${markdown_dir}/alive_${alive_subdomain_folder_
 		touch ${markdown_dir}/alive_${alive_subdomain_folder_name}/report_${alive_subdomain_folder_name}.mdpp
 		echo "### ${alive_subdomain_folder_name}" >> ${markdown_dir}/alive_${alive_subdomain_folder_name}/report_${alive_subdomain_folder_name}.mdpp
 
-		#nuclei results will be printed here	
+		#nuclei results will be printed here
 		echo "### NUCLEI" >> ${markdown_dir}/alive_${alive_subdomain_folder_name}/report_${alive_subdomain_folder_name}.mdpp
 
-		for nuclei_output in $(ls $bin/alive_${alive_subdomain_folder_name}/${alive_subdomain_folder_name}_nuclei_op); do
+		for nuclei_output in $bin/alive_${alive_subdomain_folder_name}/*; do
 
 
-			nuclei_output_filename=$(echo ${nuclei_output} | cut -d "." -f 1 ) 
+			nuclei_output_filename=$(echo ${nuclei_output} | cut -d "." -f 1 )
 			nuclei_output_uppercase=${nuclei_output_filename^^}
 
 			echo -e "#### ${nuclei_output_uppercase}" >> ${markdown_dir}/alive_${alive_subdomain_folder_name}/report_${alive_subdomain_folder_name}.mdpp
 			cat $bin/alive_${alive_subdomain_folder_name}/${alive_subdomain_folder_name}_nuclei_op/${nuclei_output} >> ${markdown_dir}/alive_${alive_subdomain_folder_name}/report_${alive_subdomain_folder_name}.mdpp
-			
+
 
 		done
 		echo "### Javascript Code (copy to VSCode)" >> ${markdown_dir}/alive_${alive_subdomain_folder_name}/report_${alive_subdomain_folder_name}.mdpp
-		    
-		for file in $(ls ${bin}/javascript_work/scriptsresponse/${alive_subdomain_folder_name}); do
 
-				
+		for file in ${bin}/javascript_work/scriptsresponse/${alive_subdomain_folder_name}/*; do
+
+
 				js_hyperlink=$(grep ${file} ${bin}/javascript_work/scripts/${alive_subdomain_folder_name})
 
 				echo "#### ${file}" >> ${markdown_dir}/alive_${alive_subdomain_folder_name}/report_${alive_subdomain_folder_name}.mdpp
@@ -71,7 +71,7 @@ echo "## SUBDOMAINS OVERVIEW" >> ${markdown_dir}/alive_${alive_subdomain_folder_
 				echo -e "'''js" >> ${markdown_dir}/alive_${alive_subdomain_folder_name}/report_${alive_subdomain_folder_name}.mdpp
 				cat ${bin}/javascript_work/scriptsresponse/${alive_subdomain_folder_name}/${file} | head -n 50 >> ${markdown_dir}/alive_${alive_subdomain_folder_name}/report_${alive_subdomain_folder_name}.mdpp
 				echo -e "'''" >> ${markdown_dir}/alive_${alive_subdomain_folder_name}/report_${alive_subdomain_folder_name}.mdpp
-		    
+
 		done
 
 		echo "### NOTES" >> ${markdown_dir}/alive_${alive_subdomain_folder_name}/report_${alive_subdomain_folder_name}.mdpp
@@ -82,7 +82,7 @@ echo "## SUBDOMAINS OVERVIEW" >> ${markdown_dir}/alive_${alive_subdomain_folder_
 	echo "## NOT ALIVE SUBDOMAINS" >> ${markdown_dir}/${domain}_report.mdpp
 	echo "!INCLUDE \"${markdown_dir}/${domain}_subdomains.mdpp\"" >> ${markdown_dir}/${domain}_report.mdpp
 
-	for subdomain in $(cat "$bin"/"${domain}"_alive_subdomains_without_protocol.txt); do
+	while read -r subdomain; do
 		mkdir ${markdown_dir}/not_alive_${subdomain}
 		touch ${markdown_dir}/not_alive_${subdomain}/notes.md
 		touch ${markdown_dir}/not_alive_${subdomain}/report_${subdomain}.mdpp
@@ -91,7 +91,7 @@ echo "## SUBDOMAINS OVERVIEW" >> ${markdown_dir}/alive_${alive_subdomain_folder_
 
 		echo "### NOTES"
 		echo "!INCLUDE \"${markdown_dir}/alive_${alive_subdomain_folder_name}/notes.mdpp\"" >> ${markdown_dir}/not_alive_${subdomain}/report_${subdomain}.mdpp
-	done
+	done < "$bin"/"${domain}"_alive_subdomains_without_protocol.txt
 
 # PUTTING ALL SUBDOMAIN REPORTS TOGETHER INTO DOMAIN REPORT
 
@@ -100,13 +100,13 @@ echo "## SUBDOMAINS OVERVIEW" >> ${markdown_dir}/alive_${alive_subdomain_folder_
 		alive_subdomain_folder_name=$(echo ${alive_subdomain} | tr / _)
 		echo -e "!INCLUDE \"${markdown_dir}/alive_${alive_subdomain_folder_name}/report_${alive_subdomain_folder_name}.mdpp\"" >> ${markdown_dir}/${domain}_report.mdpp
 		markdown-pp ${markdown_dir}/alive_${alive_subdomain_folder_name}/report_${alive_subdomain_folder_name}.mdpp -o ${markdown_dir}/alive_${alive_subdomain_folder_name}/report_${alive_subdomain_folder_name}.md
-		mv ${markdown_dir}/alive_${alive_subdomain_folder_name}/report_${alive_subdomain_folder_name}.md ${markdown_dir}/alive_${alive_subdomain_folder_name}/report_${alive_subdomain_folder_name}.mdpp		
+		mv ${markdown_dir}/alive_${alive_subdomain_folder_name}/report_${alive_subdomain_folder_name}.md ${markdown_dir}/alive_${alive_subdomain_folder_name}/report_${alive_subdomain_folder_name}.mdpp
 	done
 	markdown-pp ${markdown_dir}/${domain}_report.mdpp -o ${markdown_dir}/${domain}_report.md
 	mv ${markdown_dir}/${domain}_report.md ${markdown_dir}/${domain}_report.mdpp
 #HERE WE WILL DO FINAL FETCH FOR BOUNTY RECON REPORT
 
-	
+
 
 markdown_dir=${dir}/markdown
 
