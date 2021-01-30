@@ -57,4 +57,4 @@ done
 
 mkdir -p $bin/github-dorking-"${domain}"
 
-gitdorker -t $GITHUB_TOKEN $GITHUB_TOKEN2 -q "${domain}" -d /home/penelope/tools/SecLists/Github-Dorks/alldorksv3 -o $bin/github-dorking-"${domain}"/findings.txt
+gitdorker -t "$GITHUB_TOKEN" "$GITHUB_TOKEN2" -q "${domain}" -d /home/penelope/tools/SecLists/Github-Dorks/alldorksv3 -o $bin/github-dorking-"${domain}"/findings.txt

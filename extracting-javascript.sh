@@ -67,18 +67,17 @@ while read -r alive_subdomain; do
 
 	bin=$dir/tools-io/not_alive_"${alive_subdomain_folder_name}"/javascript_work/
 	gau "${alive_subdomain}" |grep -iE '\.js'|grep -ivE '\.json'|sort -u  >> "${bin}"/scripts/"${alive_subdomain}"JS.txt
-	cat "${bin}"/scripts/"${alive_subdomain}"JS.txt | xargs -n2 -I@ bash -c "echo -e '\n[URL]: @\n';linkfinder.py -i @ -o cli" >> "${bin}"/endpoints/"${alive_subdomain}"PathsWithUrl.txt
-	cat "${bin}"/endpoints/"${alive_subdomain}"PathsWithUrl.txt |grep -iv '[URL]:'||sort -u > "${bin}"/no-endpoints/"${alive_subdomain}"/paypalJSPathsNoUrl.txt
-	cat "${bin}"/no-endpoints/"${alive_subdomain}"/"${alive_subdomain}"JSPathsNoUrl.txt | python3 collector.py "${bin}"/output/"${alive_subdomain}"_output
+	< "${bin}"/scripts/"${alive_subdomain}"JS.txt xargs -n2 -I@ bash -c "echo -e '\n[URL]: @\n';linkfinder.py -i @ -o cli" >> "${bin}"/endpoints/"${alive_subdomain}"PathsWithUrl.txt
+	< "${bin}"/endpoints/"${alive_subdomain}"PathsWithUrl.txt grep -iv '[URL]:'||sort -u > "${bin}"/no-endpoints/"${alive_subdomain}"/paypalJSPathsNoUrl.txt
+	< "${bin}"/no-endpoints/"${alive_subdomain}"/"${alive_subdomain}"JSPathsNoUrl.txt python3 collector.py "${bin}"/output/"${alive_subdomain}"_output
 
 	getsrc "${alive_subdomain}" >> "${bin}"/script-links/"${alive_subdomain}"_output
-	cat "${bin}"/scripts/"${alive_subdomain}"JS.txt | xargs -n2 -I @ bash -c 'echo -e "\n[URL] @\n";python3 linkfinder.py -i @ -o cli' >> "${bin}"/secrets/"${alive_subdomain}"JSSecrets.txt
+	< "${bin}"/scripts/"${alive_subdomain}"JS.txt xargs -n2 -I @ bash -c 'echo -e "\n[URL] @\n";python3 linkfinder.py -i @ -o cli' >> "${bin}"/secrets/"${alive_subdomain}"JSSecrets.txt
 
 	ffuf -u https://www.paypalobjects.com/js/ -w /home/penelope/SecLists/Javascript-URLs/js-wordlist.txt -t 200 >> "${bin}"/endpoints/"${alive_subdomain}"PathsWithUrl.txt
 
 
 done < "$bin"/"${domain}"_alive_subdomains.txt
-
 
 
 
