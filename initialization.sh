@@ -44,7 +44,7 @@ done
 
 function yes_or_no {
     while true; do
-        read -p "$* [y/n]: " yn
+        read -r "$* [y/n]: " yn
         case $yn in
             [Yy]*) return 0  ;;
             [Nn]*) echo "Aborted" ; return  1 ;;
@@ -60,34 +60,34 @@ function yes_or_no {
  fi
 
 mkdir "${domain}"
-if [ -f ./${domain}/scope.txt ];
+if [ -f ./"${domain}"/scope.txt ];
 then
   echo "DECLARING SCOPE OF YOUR PROGRAM"
   yes_or_no "Do you want to declare it? [Y/N]"
-  if [ $? -eq 0 ];
+  if  yes_or_no;
   then
-    vim ./${domain}/scope.txt
+    vim ./"${domain}"/scope.txt
   fi
 fi
 
-if [ -f ./${domain}/out-of-scope.txt ];
+if [ -f ./"${domain}"/out-of-scope.txt ];
 then
   echo "DECLARING SCOPE OF YOUR PROGRAM"
   yes_or_no "Do you want to declare it? [Y/N]"
-  if [ $? -eq 0 ];
+  if  yes_or_no;
   then
-    vim ./${domain}/out-of-scope.txt
+    vim ./"${domain}"/out-of-scope.txt
   fi
 fi
 
 
-CURRENTDATE=`date +"%Y-%m-%d"`
-echo $CURRENTDATE > $PWD/${domain}/last-init-date.txt
-mkdir -p "${domain}"/${CURRENTDATE}/tools-io
+CURRENTDATE=$(date +"%Y-%m-%d")
+echo "$CURRENTDATE" > "$PWD"/"${domain}"/last-init-date.txt
+mkdir -p "${domain}"/"${CURRENTDATE}"/tools-io
 dir=$PWD/${domain}/${CURRENTDATE}
 bin=$dir/tools-io
 
-echo "${ASN}" > ./${domain}/asn.txt
+echo "${ASN}" > ./"${domain}"/asn.txt
 
 if [ -f "./${domain}/Acquisitions.txt" ];then
 	echo "There's already text file for Acquisitions"
@@ -95,4 +95,4 @@ else
 	echo "Do you want to create Acquisitions.txt file to include"
 fi
 
-sort "${bin}"/roots.txt | uniq | tee ${bin}/tmp_roots.txt && mv "${bin}"/tmp_roots.txt "${bin}"/roots.txt
+sort "${bin}"/roots.txt | uniq | tee "${bin}"/tmp_roots.txt && mv "${bin}"/tmp_roots.txt "${bin}"/roots.txt
