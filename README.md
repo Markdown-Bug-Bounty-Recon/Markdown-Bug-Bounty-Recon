@@ -17,4 +17,4 @@ with tool ```SubOver``` and ```nuclei```
 with tool ```GitDorker```
 ## TODO
 - [ ] Implement parallelism with ```parallel```
-- [ ] Convert output to JSON format and store it somewhere. It definetely would be more fail-proof thank having plaintext results redirected to markdown format.
+- [ ] Convert output to JSON format and store it somewhere with ```jq```. It definetely would be more fail-proof thank having plaintext results redirected to markdown format.
