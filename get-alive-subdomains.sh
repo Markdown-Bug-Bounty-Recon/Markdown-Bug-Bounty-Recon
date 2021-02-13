@@ -98,24 +98,6 @@ done
  dir=$PWD/${domain}/${LAST_INIT_DATE}
  bin=$dir/tools-io
 
- <"$bin"/"${domain}"_subdomains.txt httprobe | tee  -a "$bin"/"${domain}"_alive_subdomains.txt
-
- <"$bin"/"${domain}"_alive_subdomains.txt tr -d "/" | cut -d ":" -f 2 | sort | uniq > "$bin"/"${domain}"_alive_subdomains_without_protocol.txt
- sdiff "$bin"/"${domain}"_subdomains.txt "$bin"/"${domain}"_alive_subdomains_without_protocol.txt | grep "<" | cut -d"<" -f1 | tr -d " " | tee "$bin"/tmp_"${domain}"_subdomains.txt && mv "$bin"/tmp_"${domain}"_subdomains.txt "$bin"/"${domain}"_subdomains.txt
-
- 	touch "$bin"/"${domain}"_alive-subdomain_bruting_amass.txt
- 	while read -r subdomain;
- 	do
- 		amass enum -brute -d "${subdomain}" -src -o "$bin"/"${domain}"_subdomain_bruting_amass.txt &
- 	done < "$bin"/"${domain}"_alive_subdomains.txt
-
-  sort "$bin"/"${domain}"_subdomain_bruting_amass.txt | uniq | tee "$bin"/"${domain}"_tmp_subdomain_bruting_amass.txt && mv "$bin"/"${domain}"_tmp_subdomain_bruting_amass.txt "$bin"/"${domain}"_subdomain_bruting_amass.txt
-
- 	wait
- 	cat "$bin"/"${domain}"_subdomain_bruting_amass.txt >> "$bin"/"${domain}"_alive_subdomains.txt
-
-  <"$bin"/"${domain}"_alive_subdomains.txt favfreak.py -o "$bin"/"${domain}"_favfreak
-
  else
  	echo "You passed another ${USER} account"
  fi
@@ -132,15 +114,14 @@ done
  <"$bin"/"${domain}"_alive_subdomains.txt tr -d "/" | cut -d ":" -f 2 | sort | uniq > "$bin"/"${domain}"_alive_subdomains_without_protocol.txt
  sdiff "$bin"/"${domain}"_subdomains.txt "$bin"/"${domain}"_alive_subdomains_without_protocol.txt | grep "<" | cut -d"<" -f1 | tr -d " " | tee "$bin"/tmp_"${domain}"_subdomains.txt && mv "$bin"/tmp_"${domain}"_subdomains.txt "$bin"/"${domain}"_subdomains.txt
 
- 	touch "$bin"/"${domain}"_alive-subdomain_bruting_amass.txt
- 	while read -r subdomain;
- 	do
- 		amass enum -brute -d "${subdomain}" -src -o "$bin"/"${domain}"_subdomain_bruting_amass.txt &
- 	done < "$bin"/"${domain}"_alive_subdomains.txt
+ touch "$bin"/"${domain}"_alive-subdomain_bruting_amass.txt
+ 	
+ parallel -a "$bin"/"${domain}"_alive_subdomains.txt -l 1 -j 10 -k --verbose amass enum -brute -d {} -o "$bin"/"${domain}"_subdomain_bruting_amass.txt
+ 	
 
-  sort "$bin"/"${domain}"_subdomain_bruting_amass.txt | uniq | tee "$bin"/"${domain}"_tmp_subdomain_bruting_amass.txt && mv "$bin"/"${domain}"_tmp_subdomain_bruting_amass.txt "$bin"/"${domain}"_subdomain_bruting_amass.txt
+ sort "$bin"/"${domain}"_subdomain_bruting_amass.txt | uniq | tee "$bin"/"${domain}"_tmp_subdomain_bruting_amass.txt && mv "$bin"/"${domain}"_tmp_subdomain_bruting_amass.txt "$bin"/"${domain}"_subdomain_bruting_amass.txt
 
- 	wait
- 	cat "$bin"/"${domain}"_subdomain_bruting_amass.txt >> "$bin"/"${domain}"_alive_subdomains.txt
+ wait
+ cat "$bin"/"${domain}"_subdomain_bruting_amass.txt >> "$bin"/"${domain}"_alive_subdomains.txt
 
   <"$bin"/"${domain}"_alive_subdomains.txt favfreak.py -o "$bin"/"${domain}"_favfreak
