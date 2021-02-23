@@ -19,3 +19,4 @@ with tool ```GitDorker```
 - [ ] Implement parallelism with ```parallel```
 - [ ] Convert output to JSON format and store it somewhere with ```jq```. It definetely would be more fail-proof than having plaintext results redirected to markdown format.
 - [ ] Record reports by date and check if there're any new findings worth to check out
+- [ ] Make this script more colourful!
