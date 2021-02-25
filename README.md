@@ -18,5 +18,6 @@ with tool ```GitDorker```
 ## TODO
 - [ ] Implement parallelism with ```parallel```
 - [ ] Convert output to JSON format and store it somewhere with ```jq```. It definetely would be more fail-proof than having plaintext results redirected to markdown format.
-- [ ] Record reports by date and check if there're any new findings worth to check out
+- [ ] Record reports by date and check if there're any new findings worth to check out - can be done with implementing JSON format and then moving on with that further
 - [ ] Make this script more colourful!
+- [ ] Use bbrf for defining out-of-scope sudomains, domains
