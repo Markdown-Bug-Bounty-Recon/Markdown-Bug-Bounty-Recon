@@ -17,6 +17,7 @@ with tool ```SubOver``` and ```nuclei```
 with tool ```GitDorker```
 ## TODO
 - [ ] Implement parallelism with ```parallel```
+- [ ] Develop nuclei scanning more
 - [ ] Convert output to JSON format and store it somewhere with ```jq```. It definetely would be more fail-proof than having plaintext results redirected to markdown format.
 - [ ] Record reports by date and check if there're any new findings worth to check out - can be done with implementing JSON format and then moving on with that further
 - [ ] Make this script more colourful!
