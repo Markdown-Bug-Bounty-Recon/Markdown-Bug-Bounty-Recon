@@ -47,9 +47,7 @@ done
  	echo "You passed another ${USER} account"
  fi
 
- mkdir "${domain}"
  LAST_INIT_DATE=$(cat "$PWD"/"${domain}"/last-init-date.txt)
- mkdir -p "${domain}"/"${LAST_INIT_DATE}"/tools-io
  dir=$PWD/${domain}/${LAST_INIT_DATE}
  bin=$dir/tools-io
 
@@ -61,13 +59,13 @@ do
   mkdir "${bin}"/alive_"${alive_subdomain_folder_name}"
   mkdir "${bin}"/alive_"${alive_subdomain_folder_name}"/"${alive_subdomain_folder_name}"_nuclei_op
 
-  nuclei -target "${alive_subdomain}" -t "/home/${USER_EXEC}/tools/nuclei-templates/cves/*.yaml" -c 60 -o  "$bin"/alive_"${alive_subdomain_folder_name}"/"${alive_subdomain_folder_name}"_nuclei_op/cves.txt &
-  nuclei -target "${alive_subdomain}" -t "/home/${USER_EXEC}/tools/nuclei-templates/files/*.yaml" -c 60 -o  "$bin"/alive_"${alive_subdomain_folder_name}"/"${alive_subdomain_folder_name}"_nuclei_op/files.txt &
-  nuclei -target "${alive_subdomain}" -t "/home/${USER_EXEC}/tools/nuclei-templates/panels/*.yaml" -c 60 -o  "$bin"/alive_"${alive_subdomain_folder_name}"/"${alive_subdomain_folder_name}"_nuclei_op/panels.txt &
-  nuclei -target "${alive_subdomain}" -t "/home/${USER_EXEC}/tools/nuclei-templates/security-misconfiguration/*.yaml" -c 60 -o  "$bin"/alive_"${alive_subdomain_folder_name}"/"${alive_subdomain_folder_name}"_nuclei_op/security-misconfiguration.txt &
-  nuclei -target "${alive_subdomain}" -t "/home/${USER_EXEC}/tools/nuclei-templates/technologies/*.yaml" -c 60 -o  "$bin"/alive_"${alive_subdomain_folder_name}"/"${alive_subdomain_folder_name}"_nuclei_op/technologies.txt &
-  nuclei -target "${alive_subdomain}" -t "/home/${USER_EXEC}/tools/nuclei-templates/tokens/*.yaml" -c 60 -o  "$bin"/alive_"${alive_subdomain_folder_name}"/"${alive_subdomain_folder_name}"_nuclei_op/tokens.txt &
-  nuclei -target "${alive_subdomain}" -t "/home/${USER_EXEC}/tools/nuclei-templates/vulnerabilities/*.yaml" -c 60 -o  "$bin"/alive_"${alive_subdomain_folder_name}"/"${alive_subdomain_folder_name}"_nuclei_op/vulnerabilities.txt &
-  nuclei -target "${alive_subdomain}" -t "/home/${USER_EXEC}/tools/nuclei-templates/subdomain-takeover/*.yaml" -c 60 -o  "$bin"/alive_"${alive_subdomain_folder_name}"/"${alive_subdomain_folder_name}"_nuclei_op/subdomain-takeover.txt &
+  nuclei -target "${alive_subdomain}" -t "/home/${USER_EXEC}/tools/nuclei-templates/cves/**/*.yaml" -c 60 -o  "$bin"/alive_"${alive_subdomain_folder_name}"/"${alive_subdomain_folder_name}"_nuclei_op/cves.txt &
+  nuclei -target "${alive_subdomain}" -t "/home/${USER_EXEC}/tools/nuclei-templates/files/**/*.yaml" -c 60 -o  "$bin"/alive_"${alive_subdomain_folder_name}"/"${alive_subdomain_folder_name}"_nuclei_op/files.txt &
+  nuclei -target "${alive_subdomain}" -t "/home/${USER_EXEC}/tools/nuclei-templates/panels/**/*.yaml" -c 60 -o  "$bin"/alive_"${alive_subdomain_folder_name}"/"${alive_subdomain_folder_name}"_nuclei_op/panels.txt &
+  nuclei -target "${alive_subdomain}" -t "/home/${USER_EXEC}/tools/nuclei-templates/security-misconfiguration/**/*.yaml" -c 60 -o  "$bin"/alive_"${alive_subdomain_folder_name}"/"${alive_subdomain_folder_name}"_nuclei_op/security-misconfiguration.txt &
+  nuclei -target "${alive_subdomain}" -t "/home/${USER_EXEC}/tools/nuclei-templates/technologies/**/*.yaml" -c 60 -o  "$bin"/alive_"${alive_subdomain_folder_name}"/"${alive_subdomain_folder_name}"_nuclei_op/technologies.txt &
+  nuclei -target "${alive_subdomain}" -t "/home/${USER_EXEC}/tools/nuclei-templates/tokens/**/*.yaml" -c 60 -o  "$bin"/alive_"${alive_subdomain_folder_name}"/"${alive_subdomain_folder_name}"_nuclei_op/tokens.txt &
+  nuclei -target "${alive_subdomain}" -t "/home/${USER_EXEC}/tools/nuclei-templates/vulnerabilities/**/*.yaml" -c 60 -o  "$bin"/alive_"${alive_subdomain_folder_name}"/"${alive_subdomain_folder_name}"_nuclei_op/vulnerabilities.txt &
+  nuclei -target "${alive_subdomain}" -t "/home/${USER_EXEC}/tools/nuclei-templates/subdomain-takeover/**/*.yaml" -c 60 -o  "$bin"/alive_"${alive_subdomain_folder_name}"/"${alive_subdomain_folder_name}"_nuclei_op/subdomain-takeover.txt &
   wait
 done < "${bin}"/"${domain}"_alive_subdomains.txt
