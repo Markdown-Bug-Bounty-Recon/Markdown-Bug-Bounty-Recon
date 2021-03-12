@@ -29,6 +29,9 @@ while getopts d:a:u: OPTION; do
 	case $OPTION in
 		d)
 		domain="$OPTARG"
+		mkdir "${domain}"
+		touch "${PWD}"/"${domain}"/roots.txt
+		echo ${domain} >> "${PWD}"/"${domain}"/roots.txt
 		;;
 		a)
 		ASN="$OPTARG"
@@ -59,7 +62,6 @@ function yes_or_no {
  	echo "You passed another ${USER} account"
  fi
 
-mkdir "${domain}"
 if [ -f ./"${domain}"/scope.txt ];
 then
   echo "DECLARING SCOPE OF YOUR PROGRAM"
@@ -72,7 +74,7 @@ fi
 
 if [ -f ./"${domain}"/out-of-scope.txt ];
 then
-  echo "DECLARING SCOPE OF YOUR PROGRAM"
+  echo "DECLARING OUT OF SCOPE OF YOUR PROGRAM"
   yes_or_no "Do you want to declare it? [Y/N]"
   if  yes_or_no;
   then
@@ -84,8 +86,6 @@ fi
 CURRENTDATE=$(date +"%Y-%m-%d")
 echo "$CURRENTDATE" > "$PWD"/"${domain}"/last-init-date.txt
 mkdir -p "${domain}"/"${CURRENTDATE}"/tools-io
-dir=$PWD/${domain}/${CURRENTDATE}
-bin=$dir/tools-io
 
 echo "${ASN}" > ./"${domain}"/asn.txt
 
@@ -95,4 +95,4 @@ else
 	echo "Do you want to create Acquisitions.txt file to include"
 fi
 
-sort "${bin}"/roots.txt | uniq | tee "${bin}"/tmp_roots.txt && mv "${bin}"/tmp_roots.txt "${bin}"/roots.txt
+sort "${PWD}"/"${domain}"/roots.txt | uniq > "${PWD}"/"${domain}"/tmp_roots.txt && mv "${PWD}"/"${domain}"/tmp_roots.txt "${PWD}"/"${domain}"/roots.txt

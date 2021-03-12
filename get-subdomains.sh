@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -x
 
 usage(){
 
@@ -48,15 +48,12 @@ done
  fi
 
 
- mkdir "${domain}"
  LAST_INIT_DATE=$(cat "$PWD"/"${domain}"/last-init-date.txt)
  mkdir -p "${domain}"/"${LAST_INIT_DATE}"/tools-io
  dir=$PWD/${domain}/${LAST_INIT_DATE}
  bin=$dir/tools-io
 
 while read -r domain; do
-	mkdir "$bin"/"${domain}"
-	bin=$dir/bin/${domain}
 	## Wappalyzer / Listing Technologies
 	https_link=$(echo "${domain}" | httprobe)
 	node "/home/${USER_EXEC}/tools/wappalyzer/src/drivers/npm/cli.js" "$https_link" -P | jq '.technologies[].name' | tee "$bin"/"${domain}"_technologies.txt
@@ -95,4 +92,4 @@ while read -r domain; do
 
 	sort "$bin"/"${domain}"_subdomains.txt | uniq | tee "$bin"/tmp_"${domain}"_subdomains.txt && mv "$bin"/tmp_"${domain}"_subdomains.txt "$bin"/"${domain}"_subdomains.txt
 
-	done < "${bin}"/roots.txt
+	done < "${PWD}"/"${domain}"/roots.txt

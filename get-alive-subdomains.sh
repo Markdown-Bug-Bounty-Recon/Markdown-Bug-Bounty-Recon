@@ -43,6 +43,9 @@ done
  if [ -z "${USER_EXEC}" ]; then
  	echo "You did not passed another ${USER} account, executing as root user"
  	USER_EXEC=root#!/bin/bash
+else
+ echo "You passed another ${USER} account"
+fi
 
 usage(){
 
@@ -92,22 +95,11 @@ done
  fi
 
 
- mkdir "${domain}"
  LAST_INIT_DATE=$(cat "$PWD"/"${domain}"/last-init-date.txt)
  mkdir -p "${domain}"/"${LAST_INIT_DATE}"/tools-io
  dir=$PWD/${domain}/${LAST_INIT_DATE}
  bin=$dir/tools-io
 
- else
- 	echo "You passed another ${USER} account"
- fi
-
-
- mkdir "${domain}"
- LAST_INIT_DATE=$(cat "$PWD"/"${domain}"/last-init-date.sh)
- mkdir -p "${domain}"/"${LAST_INIT_DATE}"/tools-io
- dir=$PWD/${domain}/${LAST_INIT_DATE}
- bin=$dir/tools-io
 
  <"$bin"/"${domain}"_subdomains.txt httprobe | tee  -a "$bin"/"${domain}"_alive_subdomains.txt
 
@@ -115,9 +107,10 @@ done
  sdiff "$bin"/"${domain}"_subdomains.txt "$bin"/"${domain}"_alive_subdomains_without_protocol.txt | grep "<" | cut -d"<" -f1 | tr -d " " | tee "$bin"/tmp_"${domain}"_subdomains.txt && mv "$bin"/tmp_"${domain}"_subdomains.txt "$bin"/"${domain}"_subdomains.txt
 
  touch "$bin"/"${domain}"_alive-subdomain_bruting_amass.txt
- 	
+
+ # Amass bruting
  parallel -a "$bin"/"${domain}"_alive_subdomains.txt -l 1 -j 10 -k --verbose amass enum -brute -d {} -o "$bin"/"${domain}"_subdomain_bruting_amass.txt
- 	
+
 
  sort "$bin"/"${domain}"_subdomain_bruting_amass.txt | uniq | tee "$bin"/"${domain}"_tmp_subdomain_bruting_amass.txt && mv "$bin"/"${domain}"_tmp_subdomain_bruting_amass.txt "$bin"/"${domain}"_subdomain_bruting_amass.txt
 
