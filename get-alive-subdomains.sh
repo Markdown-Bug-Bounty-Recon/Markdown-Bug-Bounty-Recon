@@ -109,7 +109,7 @@ done
  touch "$bin"/"${domain}"_alive-subdomain_bruting_amass.txt
 
  # Amass bruting
- parallel -a "$bin"/"${domain}"_alive_subdomains.txt -l 1 -j 10 -k --verbose amass enum -brute -d {} -o "$bin"/"${domain}"_subdomain_bruting_amass.txt
+ parallel -a "$bin"/"${domain}"_alive_subdomains_without_protocol.txt-l 1 -j 10 -k --verbose amass enum -brute -d {} -o "$bin"/"${domain}"_subdomain_bruting_amass.txt
 
 
  sort "$bin"/"${domain}"_subdomain_bruting_amass.txt | uniq | tee "$bin"/"${domain}"_tmp_subdomain_bruting_amass.txt && mv "$bin"/"${domain}"_tmp_subdomain_bruting_amass.txt "$bin"/"${domain}"_subdomain_bruting_amass.txt

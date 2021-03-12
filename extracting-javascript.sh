@@ -48,7 +48,7 @@ done
  fi
 
 
- mkdir "${domain}"
+
  LAST_INIT_DATE=$(cat "$PWD"/"${domain}"/last-init-date.txt)
  mkdir -p "${domain}"/"${LAST_INIT_DATE}"/tools-io
  dir=$PWD/${domain}/${LAST_INIT_DATE}
@@ -66,15 +66,15 @@ while read -r alive_subdomain; do
 	alive_subdomain_folder_name=$(echo "${alive_subdomain}" | tr / _ ) # Because in creation of directories, the '/' letter is not escaped we need to cut out only domain.com and get rid of 'https://''
 
 	bin=$dir/tools-io/not_alive_"${alive_subdomain_folder_name}"/javascript_work/
-	gau "${alive_subdomain}" |grep -iE '\.js'|grep -ivE '\.json'|sort -u  >> "${bin}"/scripts/"${alive_subdomain}"JS.txt
-	< "${bin}"/scripts/"${alive_subdomain}"JS.txt xargs -n2 -I@ bash -c "echo -e '\n[URL]: @\n';linkfinder.py -i @ -o cli" >> "${bin}"/endpoints/"${alive_subdomain}"PathsWithUrl.txt
-	< "${bin}"/endpoints/"${alive_subdomain}"PathsWithUrl.txt grep -iv '[URL]:'||sort -u > "${bin}"/no-endpoints/"${alive_subdomain}"/paypalJSPathsNoUrl.txt
-	< "${bin}"/no-endpoints/"${alive_subdomain}"/"${alive_subdomain}"JSPathsNoUrl.txt python3 collector.py "${bin}"/output/"${alive_subdomain}"_output
+	gau "${alive_subdomain}" |grep -iE '\.js'|grep -ivE '\.json'|sort -u  >> "${bin}"/scripts/"${alive_subdomain_folder_name}"JS.txt
+	< "${bin}"/scripts/"${alive_subdomain_folder_name}"JS.txt xargs -n2 -I@ bash -c "echo -e '\n[URL]: @\n';linkfinder.py -i @ -o cli" >> "${bin}"/endpoints/"${alive_subdomain_folder_name}"PathsWithUrl.txt
+	< "${bin}"/endpoints/"${alive_subdomain_folder_name}"PathsWithUrl.txt grep -iv '[URL]:'||sort -u > "${bin}"/no-endpoints/"${alive_subdomain_folder_name}"/paypalJSPathsNoUrl.txt
+	< "${bin}"/no-endpoints/"${alive_subdomain_folder_name}"/"${alive_subdomain_folder_name}"JSPathsNoUrl.txt python3 collector.py "${bin}"/output/"${alive_subdomain_folder_name}"_output
 
-	getsrc "${alive_subdomain}" >> "${bin}"/script-links/"${alive_subdomain}"_output
-	< "${bin}"/scripts/"${alive_subdomain}"JS.txt xargs -n2 -I @ bash -c 'echo -e "\n[URL] @\n";python3 linkfinder.py -i @ -o cli' >> "${bin}"/secrets/"${alive_subdomain}"JSSecrets.txt
+	getsrc "${alive_subdomain}" >> "${bin}"/script-links/"${alive_subdomain_folder_name}"_output
+	< "${bin}"/scripts/"${alive_subdomain_folder_name}"JS.txt xargs -n2 -I @ bash -c 'echo -e "\n[URL] @\n";python3 linkfinder.py -i @ -o cli' >> "${bin}"/secrets/"${alive_subdomain_folder_name}"JSSecrets.txt
 
-	ffuf -u https://www.paypalobjects.com/js/ -w /home/penelope/SecLists/Javascript-URLs/js-wordlist.txt -t 200 >> "${bin}"/endpoints/"${alive_subdomain}"PathsWithUrl.txt
+	ffuf -u https://www.paypalobjects.com/js/ -w /home/penelope/SecLists/Javascript-URLs/js-wordlist.txt -t 200 >> "${bin}"/endpoints/"${alive_subdomain_folder_name}"PathsWithUrl.txt
 
 
 done < "$bin"/"${domain}"_alive_subdomains.txt
