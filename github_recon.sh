@@ -42,14 +42,10 @@ done
 
 
  if [ -z "${USER_EXEC}" ]; then
- 	echo "You did not passed another ${USER} account, executing as root user"
  	USER_EXEC=root
- else
- 	echo "You passed another ${USER} account"
  fi
 
 
- mkdir "${domain}"
  LAST_INIT_DATE=$(cat "$PWD"/"${domain}"/last-init-date.txt)
  mkdir -p "${domain}"/"${LAST_INIT_DATE}"/tools-io
  dir=$PWD/${domain}/${LAST_INIT_DATE}
