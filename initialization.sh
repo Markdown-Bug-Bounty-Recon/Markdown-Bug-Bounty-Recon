@@ -31,7 +31,7 @@ while getopts d:a:u: OPTION; do
 		domain="$OPTARG"
 		mkdir "${domain}"
 		touch "${PWD}"/"${domain}"/roots.txt
-		echo ${domain} >> "${PWD}"/"${domain}"/roots.txt
+		echo "${domain}" >> "${PWD}"/"${domain}"/roots.txt
 		;;
 		a)
 		ASN="$OPTARG"
