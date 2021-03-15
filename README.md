@@ -26,7 +26,7 @@
 - This converts the contents of tools-io directory to markdown 
 - **This breaks a lot**, because with every new functionality I need to change this markdown-converter
 
-## On what topics and subject I'll focus for now?
+## On which topics and subject I'll focus for now?
 - Definetely finding more root domains and subdomain enumeration, also discovering technologies and ways to use that data
 - Also managing scope, detecting the scope of the program, put a massive distinction between passive scanning and active scanning to not make bug-bounty programs angry! D:
 - Being the most accurate, **NOT FOLLOWING THE PHILOSOPHY "BRUTE SPRAY AND PRAY"**
