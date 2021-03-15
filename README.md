@@ -1,5 +1,5 @@
 
-# WORK IN PROGRESS
+# WORK IN PROGRESS / FOR PERSONAL USE / FOR INSPIRATION TO OTHERS <3
 
 ## For now though I'll present to you what each script does:
 
