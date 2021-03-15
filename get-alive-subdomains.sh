@@ -97,10 +97,15 @@ done
  dir=$PWD/${domain}/${LAST_INIT_DATE}
  bin=$dir/tools-io
 
+			# We do the same thing as in get-subdomains-passively.sh again, but this time with -active flag
+		amass enum -active -d "${domain}" -o "$bin"/"${domain}"_subdomains_amass.txt
+		cat "$bin"/"${domain}"_subdomains_amass.txt >> "$bin"/"${domain}"_subdomains.txt
+		rm "$bin"/"${domain}"_subdomains_amass.txt
+		sort "$bin"/"${domain}"_subdomains.txt | uniq | tee "$bin"/tmp_"${domain}"_subdomains.txt && mv "$bin"/tmp_"${domain}"_subdomains.txt "$bin"/"${domain}"_subdomains.txt
 
  <"$bin"/"${domain}"_subdomains.txt httprobe | tee  -a "$bin"/"${domain}"_alive_subdomains.txt
 
- <"$bin"/"${domain}"_alive_subdomains.txt tr -d "/" | cut -d ":" -f 2 | sort | uniq > "$bin"/"${domain}"_alive_subdomains_without_protocol.txt
+ <"$bin"/"${domain}"_alive_subdomains.txt tr -d "/" | cut -d ":" -f 2 | sort | uniq -o "$bin"/"${domain}"_alive_subdomains_without_protocol.txt
  sdiff "$bin"/"${domain}"_subdomains.txt "$bin"/"${domain}"_alive_subdomains_without_protocol.txt | grep "<" | cut -d"<" -f1 | tr -d " " | tee "$bin"/tmp_"${domain}"_subdomains.txt && mv "$bin"/tmp_"${domain}"_subdomains.txt "$bin"/"${domain}"_subdomains.txt
 
  touch "$bin"/"${domain}"_alive-subdomain_bruting_amass.txt

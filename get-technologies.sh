@@ -30,9 +30,6 @@ while getopts d:a:u: OPTION; do
 		d)
 		domain="$OPTARG"
 		;;
-		a)
-		ASN="$OPTARG"
-		;;
 		u)
 		USER_EXEC="$OPTARG"
 		;;
@@ -42,11 +39,16 @@ while getopts d:a:u: OPTION; do
 	esac
 done
 
-initialization.sh -d "$domain" -a "$ASN" -u "$USER_EXEC"
-get-technologies -d "$domain" -u "$USER_EXEC"
-get-subdomains-passively.sh -d "$domain" -u "$USER_EXEC"
-get-alive-subdomains.sh -d "$domain" -u "$USER_EXEC"
-get-not-alive-subdomains-ip.sh -d "$domain" -u "$USER_EXEC"
-bruting-not-alive-subdomains-ip.sh -d "$domain" -u "$USER_EXEC"
-extracting-javascript.sh -d "$domain" -u "$USER_EXEC"
-bruting-alive-subdomains.sh -d "$domain" -u "$USER_EXEC"
+
+ if [ -z "${USER_EXEC}" ]; then
+ 	USER_EXEC=root
+ fi
+
+
+ LAST_INIT_DATE=$(cat "$PWD"/"${domain}"/last-init-date.txt)
+ mkdir -p "${domain}"/"${LAST_INIT_DATE}"/tools-io
+ dir=$PWD/${domain}/${LAST_INIT_DATE}
+ bin=$dir/tools-io
+
+https_link=$(echo "${domain}" | httprobe | head -n 1)
+node "/home/${USER_EXEC}/tools/wappalyzer/src/drivers/npm/cli.js" "$https_link" -P | jq '.technologies[].name' | tee "$bin"/"${domain}"_technologies.txt

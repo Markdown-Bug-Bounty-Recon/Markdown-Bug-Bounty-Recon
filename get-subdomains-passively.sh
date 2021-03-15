@@ -55,36 +55,36 @@ while read -r domain; do
 	https_link=$(echo "${domain}" | httprobe)
 	node "/home/${USER_EXEC}/tools/wappalyzer/src/drivers/npm/cli.js" "$https_link" -P | jq '.technologies[].name' | tee "$bin"/"${domain}"_technologies.txt
 
+ # MANY OF THESE TOOLS ARE COMMENTED, BECAUSE AMASS ALREADY OFFERS ENUMERATION FROM DIFFERENT OUTPUTS AND APIs!
+
 	## Crawling the website with hakrawler to find new roots, subdomain and javascript files
-
-	hakrawler -url "${domain}" -depth 2 -js -plain | tee "$bin"/"${domain}"_javascript_files.txt &
-
-	hakrawler -url "${domain}" -depth 1 -subs -usewayback -plain | tee -a "$bin"/"${domain}"_subdomains.txt
-	wait
-	sed -i 's/www.//' "$bin"/"${domain}"_subdomains.txt # Some of the output from hakrawler begin with 'www.' to make this output uniform we're using sed on it
+	#hakrawler -url "${domain}" -depth 2 -js -plain | tee "$bin"/"${domain}"_javascript_files.txt &
+	#hakrawler -url "${domain}" -depth 1 -subs -usewayback -plain | tee -a "$bin"/"${domain}"_subdomains.txt
+	#wait
+	#sed -i 's/www.//' "$bin"/"${domain}"_subdomains.txt # Some of the output from hakrawler begin with 'www.' to make this output uniform we're using sed on it
 
 
 	## Analyzing Javascript with SubDomainizer and subscraper
-	SubDomainizer.py -l "$bin"/"${domain}"_javascript_files.txt -o "$bin"/"${domain}"_subdomains_subdomainizer.txt
+	#SubDomainizer.py -l "$bin"/"${domain}"_javascript_files.txt -o "$bin"/"${domain}"_subdomains_subdomainizer.txt
 
 
 	# Subdomain Scraping
-	amass enum -d "${domain}" -o "$bin"/"${domain}"_subdomains_amass.txt &
-	subfinder -d "${domain}" -o "$bin"/"${domain}"_subdomains_subfinder.txt &
-	curl "https://tls.bufferover.run/dns?q=.${domain}" 2>/dev/null | jq .Results | cut -d ',' -f 3 | tr -d '\"' | tr -d ']' | tr -d '[' | tee -a "$bin"/"${domain}"_subdomains_cloud.txt & # YES I KNOW THAT THESE 'TR' LOOK TERRIBLE, WILL CHANGE IT TO SED SOMEDAY OR GREP
+	amass enum -passive -d "${domain}" -o "$bin"/"${domain}"_subdomains_amass.txt &
+	#subfinder -d "${domain}" -o "$bin"/"${domain}"_subdomains_subfinder.txt &
+	#curl "https://tls.bufferover.run/dns?q=.${domain}" 2>/dev/null | jq .Results | cut -d ',' -f 3 | tr -d '\"' | tr -d ']' | tr -d '[' | tee -a "$bin"/"${domain}"_subdomains_cloud.txt & # YES I KNOW THAT THESE 'TR' LOOK TERRIBLE, WILL CHANGE IT TO SED SOMEDAY OR GREP
 	wait
 
 	# Fetching the final results
 	cat "$bin"/"${domain}"_subdomains_amass.txt >> "$bin"/"${domain}"_subdomains.txt &
-    cat "$bin"/"${domain}"_subdomains_subfinder.txt >> "$bin"/"${domain}"_subdomains.txt &
-	cat "$bin"/"${domain}"_subdomains_cloud.txt >> "$bin"/"${domain}"_subdomains.txt &
-	cat "$bin"/"${domain}"_subdomains_subdomainizer.txt >> "$bin"/"${domain}"_subdomains.txt &
+  #  cat "$bin"/"${domain}"_subdomains_subfinder.txt >> "$bin"/"${domain}"_subdomains.txt &
+	#cat "$bin"/"${domain}"_subdomains_cloud.txt >> "$bin"/"${domain}"_subdomains.txt &
+	#cat "$bin"/"${domain}"_subdomains_subdomainizer.txt >> "$bin"/"${domain}"_subdomains.txt &
 	wait
 	#Deleting the unnecessary
 	rm "$bin"/"${domain}"_subdomains_amass.txt &
-	rm "$bin"/"${domain}"_subdomains_subfinder.txt &
-	rm "$bin"/"${domain}"_subdomains_cloud.txt &
-	rm "$bin"/"${domain}"_subdomains_subdomainizer.txt &
+	#rm "$bin"/"${domain}"_subdomains_subfinder.txt &
+	#rm "$bin"/"${domain}"_subdomains_cloud.txt &
+	#rm "$bin"/"${domain}"_subdomains_subdomainizer.txt &
 	wait
 
 	sort "$bin"/"${domain}"_subdomains.txt | uniq | tee "$bin"/tmp_"${domain}"_subdomains.txt && mv "$bin"/tmp_"${domain}"_subdomains.txt "$bin"/"${domain}"_subdomains.txt
