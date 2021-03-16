@@ -1,6 +1,15 @@
 
 # WORK IN PROGRESS / FOR PERSONAL USE / FOR INSPIRATION TO OTHERS <3
 
+## How is this recon framework different from others?
+- Puts every specific-subdomain data to particular folder associated with that subdomain, If you get comfortable with the directory structure then using this script will be a lot easier
+- The concept of this script is to convert all findings into one Markdown report, then you can import this report to ```Notion```, share this file with others and then collaborate easier
+- I want to make it run parallel
+- No Cloud subscription required. I want these script to run locally in the background with 0$ 
+
+## How to use this framework?
+1. The easiest way is to use my docker container [blackarch-zsh](https://github.com/Cloufish/blackarch-zsh-container), create the ```~/Pentesting``` directory on the host machine and run the container
+2. Then on the docker container change directory to this ```~/Pentesting``` directory and execute ```sudo full-web.sh -d ${domain} -u ${USER-EXEC}``` where ${domain} is your target domain and ${USER-EXEC} is the username home directory name **this is important, because otherwise finding would be put in /home/root/  which is not-intented``` (and I don't know how to remove the necessity of declaring this -u flag other than not executing as root)
 ## For now though I'll present to you what each script does:
 
 ### full_web.sh
@@ -32,6 +41,7 @@
 - Being the most accurate, **NOT FOLLOWING THE PHILOSOPHY "BRUTE SPRAY AND PRAY"**
 - **I don't want to** focus on brute-forcing mainly, because in the end everyone does that, but someday I'll get down to it
 ## TODO
+- [ ] Create separate docker container for this script to run
 - [ ] Using Amass intel to get the company ASN number and more root domains
 - [ ] Implement parallelism with ```parallel```
 - [ ] Develop nuclei scanning more to take into account the output of get-technologies.sh
@@ -39,3 +49,4 @@
 - [ ] Record reports by date and check if there're any new findings worth to check out - can be done with implementing JSON format and then moving on with that further
 - [ ] Make this script more colourful!
 - [ ] Use bbrf for defining out-of-scope sudomains, domains
+- [ ] Notifications via Slack channel
