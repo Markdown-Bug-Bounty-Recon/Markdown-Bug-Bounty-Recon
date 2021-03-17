@@ -47,10 +47,11 @@ done
 
  LAST_INIT_DATE=$(cat "$PWD"/"${domain}"/last-init-date.txt)
  while read -r domain; do
+
 	 mkdir -p "${domain}"/"${LAST_INIT_DATE}"/tools-io
 	 dir=$PWD/${domain}/${LAST_INIT_DATE}
 	 bin=$dir/tools-io
 
 	https_link=$(echo "${domain}" | httprobe | head -n 1)
 	node "/home/${USER_EXEC}/tools/wappalyzer/src/drivers/npm/cli.js" "$https_link" -P | jq '.technologies[].name' | tee "$bin"/"${domain}"_technologies.txt
-done
+done < "${PWD}"/"${domain}"/roots.txt

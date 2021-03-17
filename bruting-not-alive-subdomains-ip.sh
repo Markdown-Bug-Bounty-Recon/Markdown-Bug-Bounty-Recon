@@ -46,9 +46,12 @@ done
 
 
  LAST_INIT_DATE=$(cat "$PWD"/"${domain}"/last-init-date.txt)
- dir=$PWD/${domain}/${LAST_INIT_DATE}
- bin=$dir/tools-io
 while read -r domain; do
+
+	mkdir -p "${domain}"/"${LAST_INIT_DATE}"/"$domain"/tools-io
+	dir=$PWD/${domain}/${LAST_INIT_DATE}/"$domain"
+	bin=$dir/tools-io
+
 	while read -r line;
 	do
 	  ip=$(echo "${line}" | awk -F"," '{print $1}')

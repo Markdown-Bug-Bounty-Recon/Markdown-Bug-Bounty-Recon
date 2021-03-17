@@ -49,7 +49,7 @@ done
 
 while read -r domain; do
 	mkdir -p "${domain}"/"${LAST_INIT_DATE}"/"$domain"/tools-io
-	dir=$PWD/${domain}/${LAST_INIT_DATE}/$domain
+	dir=$PWD/${domain}/${LAST_INIT_DATE}/"$domain"
 	bin=$dir/tools-io
 	## Wappalyzer / Listing Technologies
 	https_link=$(echo "${domain}" | httprobe)

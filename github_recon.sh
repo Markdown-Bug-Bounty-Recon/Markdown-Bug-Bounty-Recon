@@ -47,12 +47,13 @@ done
 
 
  LAST_INIT_DATE=$(cat "$PWD"/"${domain}"/last-init-date.txt)
- mkdir -p "${domain}"/"${LAST_INIT_DATE}"/tools-io
- dir=$PWD/${domain}/${LAST_INIT_DATE}
- bin=$dir/tools-io
+
 
 while read -r domain; do
-mkdir -p "$bin"/github-dorking-"${domain}"
+	mkdir -p "${domain}"/"${LAST_INIT_DATE}"/"$domain"/tools-io
+	dir=$PWD/${domain}/${LAST_INIT_DATE}/"$domain"
+	bin=$dir/tools-io
+	mkdir -p "$bin"/github-dorking-"${domain}"
 
-gitdorker -t "$GITHUB_TOKEN" "$GITHUB_TOKEN2" -q "${domain}" -d /home/penelope/tools/SecLists/Github-Dorks/alldorksv3 -o "$bin"/github-dorking-"${domain}"/findings.txt
+	gitdorker -t "$GITHUB_TOKEN" "$GITHUB_TOKEN2" -q "${domain}" -d /home/penelope/tools/SecLists/Github-Dorks/alldorksv3 -o "$bin"/github-dorking-"${domain}"/findings.txt
 done < "${PWD}"/"${domain}"/roots.txt

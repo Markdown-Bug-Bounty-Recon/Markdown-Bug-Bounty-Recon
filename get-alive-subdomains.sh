@@ -93,10 +93,12 @@ done
 
 
  LAST_INIT_DATE=$(cat "$PWD"/"${domain}"/last-init-date.txt)
- mkdir -p "${domain}"/"${LAST_INIT_DATE}"/tools-io
- dir=$PWD/${domain}/${LAST_INIT_DATE}
- bin=$dir/tools-io
 while read -r domain; do
+
+	mkdir -p "${domain}"/"${LAST_INIT_DATE}"/"$domain"/tools-io
+	dir=$PWD/${domain}/${LAST_INIT_DATE}/"$domain"
+	bin=$dir/tools-io
+	
 			# We do the same thing as in get-subdomains-passively.sh again, but this time with -active flag
 		amass enum -active -d "${domain}" -o "$bin"/"${domain}"_subdomains_amass.txt
 		cat "$bin"/"${domain}"_subdomains_amass.txt >> "$bin"/"${domain}"_subdomains.txt

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -x
 
 usage(){
 
@@ -82,7 +82,7 @@ fi
 
 CURRENTDATE=$(date +"%Y-%m-%d")
 echo "$CURRENTDATE" > "$PWD"/"${domain}"/last-init-date.txt
-mkdir -p "${domain}"/"${CURRENTDATE}"/tools-io
+mkdir -p "${domain}"/"${CURRENTDATE}"/"$domain"/tools-io
 
 echo "${ASN}" > ./"${domain}"/asn.txt
 

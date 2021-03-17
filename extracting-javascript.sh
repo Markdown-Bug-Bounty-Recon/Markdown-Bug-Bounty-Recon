@@ -47,11 +47,13 @@ done
 
 
  LAST_INIT_DATE=$(cat "$PWD"/"${domain}"/last-init-date.txt)
- mkdir -p "${domain}"/"${LAST_INIT_DATE}"/tools-io
- dir=$PWD/${domain}/${LAST_INIT_DATE}
- bin=$dir/tools-io
 
 while read -r domain; do
+
+	mkdir -p "${domain}"/"${LAST_INIT_DATE}"/"$domain"/tools-io
+	dir=$PWD/${domain}/${LAST_INIT_DATE}/"$domain"
+	bin=$dir/tools-io
+
 while read -r alive_subdomain; do
 	alive_subdomain_folder_name=$(echo "${alive_subdomain}" | tr / _ ) # Because in creation of directories, the '/' letter is not escaped we need to cut out only domain.com and get rid of 'https://''
 
