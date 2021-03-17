@@ -96,7 +96,7 @@ done
  mkdir -p "${domain}"/"${LAST_INIT_DATE}"/tools-io
  dir=$PWD/${domain}/${LAST_INIT_DATE}
  bin=$dir/tools-io
-
+while read -r domain; do
 			# We do the same thing as in get-subdomains-passively.sh again, but this time with -active flag
 		amass enum -active -d "${domain}" -o "$bin"/"${domain}"_subdomains_amass.txt
 		cat "$bin"/"${domain}"_subdomains_amass.txt >> "$bin"/"${domain}"_subdomains.txt
@@ -120,3 +120,4 @@ done
  cat "$bin"/"${domain}"_subdomain_bruting_amass.txt >> "$bin"/"${domain}"_alive_subdomains.txt
 
   <"$bin"/"${domain}"_alive_subdomains.txt favfreak.py -o "$bin"/"${domain}"_favfreak
+done < "${PWD}"/"${domain}"/roots.txt

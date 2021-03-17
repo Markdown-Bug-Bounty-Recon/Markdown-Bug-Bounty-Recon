@@ -48,24 +48,25 @@ done
  LAST_INIT_DATE=$(cat "$PWD"/"${domain}"/last-init-date.txt)
  dir=$PWD/${domain}/${LAST_INIT_DATE}
  bin=$dir/tools-io
-q
-while read -r line;
-do
-  ip=$(echo "${line}" | awk -F"," '{print $1}')
-  subdomain=$(echo "${line}" | awk -F"," '{print $2}')
-  subdomain=${subdomain%?} # For some reason, without it there will be dot sign after .com e.g "subdomain.com."
-  mkdir "$bin"/not_alive_"${subdomain}"
+while read -r domain; do
+	while read -r line;
+	do
+	  ip=$(echo "${line}" | awk -F"," '{print $1}')
+	  subdomain=$(echo "${line}" | awk -F"," '{print $2}')
+	  subdomain=${subdomain%?} # For some reason, without it there will be dot sign after .com e.g "subdomain.com."
+	  mkdir "$bin"/not_alive_"${subdomain}"
 
-  masscan "${ip}" --ports 0-65535 ––rate 1000 -oX "${bin}"/not_alive_"${subdomain}"/masscan_grepable.json
-
-
-
-  # NMAP SCAN WITH -oG flag output
-
-  # nmap -T4 -A -p- -Pn -oN "${bin}"/not_alive_"${subdomain}"/nmap-results.txt -oX "${bin}"/not_alive_"${subdomain}"/nmap-results.xml $subdomain
-
-  # ----------------
-  #brutespray -f $bin/not_alive_${subdomain}/${domain}_${subdomain}_nmap.txt -o $bin/not_alive_${subdomain}/${domain}_${subdomain}_brutespray
+	  masscan "${ip}" --ports 0-65535 ––rate 1000 -oX "${bin}"/not_alive_"${subdomain}"/masscan_grepable.json
 
 
-done < "${bin}"/"${domain}"_subdomains_ip.txt
+
+	  # NMAP SCAN WITH -oG flag output
+
+	  # nmap -T4 -A -p- -Pn -oN "${bin}"/not_alive_"${subdomain}"/nmap-results.txt -oX "${bin}"/not_alive_"${subdomain}"/nmap-results.xml $subdomain
+
+	  # ----------------
+	  #brutespray -f $bin/not_alive_${subdomain}/${domain}_${subdomain}_nmap.txt -o $bin/not_alive_${subdomain}/${domain}_${subdomain}_brutespray
+
+
+	done < "${bin}"/"${domain}"_subdomains_ip.txt
+done < "${PWD}"/"${domain}"/roots.txt

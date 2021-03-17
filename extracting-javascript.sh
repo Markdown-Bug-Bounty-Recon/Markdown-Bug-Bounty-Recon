@@ -51,7 +51,7 @@ done
  dir=$PWD/${domain}/${LAST_INIT_DATE}
  bin=$dir/tools-io
 
-
+while read -r domain; do
 while read -r alive_subdomain; do
 	alive_subdomain_folder_name=$(echo "${alive_subdomain}" | tr / _ ) # Because in creation of directories, the '/' letter is not escaped we need to cut out only domain.com and get rid of 'https://''
 
@@ -82,7 +82,7 @@ while read -r alive_subdomain; do
 done < "$bin"/"${domain}"_alive_subdomains.txt
 
 
-
+done < "${PWD}"/"${domain}"/roots.txt
 
 
 

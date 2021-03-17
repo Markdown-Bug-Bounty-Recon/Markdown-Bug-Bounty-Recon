@@ -46,16 +46,18 @@ done
 
 
  LAST_INIT_DATE=$(cat "$PWD"/"${domain}"/last-init-date.txt)
- mkdir -p "${domain}"/"${LAST_INIT_DATE}"/tools-io
- dir=$PWD/${domain}/${LAST_INIT_DATE}
- bin=$dir/tools-io
+while read -r domain; do
+	mkdir -p "${domain}"/"${LAST_INIT_DATE}"/"$domain"/tools-io
+	dir=$PWD/${domain}/${LAST_INIT_DATE}/$domain
+	bin=$dir/tools-io
 
-if [ -f "/home/${USER_EXEC}/lists/resolvers.txt*" ]; then
- echo "resolvers.txt file exists"
-else
- mkdir "/home/${USER_EXEC}/lists/"
- wget https://raw.githubusercontent.com/blechschmidt/massdns/master/lists/resolvers.txt -O "/home/${USER_EXEC}/lists/resolvers.txt"
-fi
+	if [ -f "/home/${USER_EXEC}/lists/resolvers.txt*" ]; then
+	 echo "resolvers.txt file exists"
+	else
+	 mkdir "/home/${USER_EXEC}/lists/"
+	 wget https://raw.githubusercontent.com/blechschmidt/massdns/master/lists/resolvers.txt -O "/home/${USER_EXEC}/lists/resolvers.txt"
+	fi
 
-massdns --resolvers /home/"${USER_EXEC}"/lists/resolvers.txt --drop-user ${USER_EXEC} --drop-group ${USER_EXEC} -t AAAA "$bin"/"${domain}"_subdomains.txt -o J -w "${bin}"/"${domain}"_dns-resolved-ip.json
-<"${bin}"/"${domain}"_dns-resolved-ip.json  jq '. | "\(.resolver) \(.name)"' | tr " " "," | tr "\"" " " | tr -s " " | awk '$1=$1' >> "$bin"/"${domain}"_subdomains_ip.txt
+	massdns --resolvers /home/"${USER_EXEC}"/lists/resolvers.txt --drop-user ${USER_EXEC} --drop-group ${USER_EXEC} -t AAAA "$bin"/"${domain}"_subdomains.txt -o J -w "${bin}"/"${domain}"_dns-resolved-ip.json
+	<"${bin}"/"${domain}"_dns-resolved-ip.json  jq '. | "\(.resolver) \(.name)"' | tr " " "," | tr "\"" " " | tr -s " " | awk '$1=$1' >> "$bin"/"${domain}"_subdomains_ip.txt
+done < "${PWD}"/"${domain}"/roots.txt
