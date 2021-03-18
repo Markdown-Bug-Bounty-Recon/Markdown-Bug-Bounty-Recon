@@ -1,3 +1,5 @@
+#!/bin/bash
+
 #!/bin/bash -x
 
 usage(){
@@ -46,12 +48,10 @@ done
 
 
  LAST_INIT_DATE=$(cat "$PWD"/"${domain}"/last-init-date.txt)
- while read -r domain; do
+ mkdir -p "${domain}"/"${LAST_INIT_DATE}"/tools-io
+ dir=$PWD/${domain}/${LAST_INIT_DATE}
+ bin=$dir/tools-io
 
-	 mkdir -p "${domain}"/"${LAST_INIT_DATE}"/"$domain"/tools-io
- 	 dir=$PWD/${domain}/${LAST_INIT_DATE}/"$domain"
- 	 bin=$dir/tools-io
 
-	https_link=$(echo "${domain}" | httprobe | head -n 1)
-	node "/home/${USER_EXEC}/tools/wappalyzer/src/drivers/npm/cli.js" "$https_link" -P | jq '.technologies[].name' | tee "$bin"/"${domain}"_technologies.txt
-done < "${PWD}"/"${domain}"/roots.txt
+amass intel -d "${domain}"-whois -o "${PWD}"/"${domain}"/roots.txt
+sort "${PWD}"/"${domain}"/roots.txt | uniq > "${PWD}"/"${domain}"/tmp_roots.txt && mv "${PWD}"/"${domain}"/tmp_roots.txt "${PWD}"/"${domain}"/roots.txt
