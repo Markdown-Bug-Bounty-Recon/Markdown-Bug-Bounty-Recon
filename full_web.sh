@@ -43,6 +43,7 @@ while getopts d:a:u: OPTION; do
 done
 
 initialization.sh -d "$domain" -a "$ASN" -u "$USER_EXEC"
+get-other-root-domains.sh -d "$domain" -u "$USER_EXEC" &
 get-technologies.sh -d "$domain" -u "$USER_EXEC"
 get-subdomains-passively.sh -d "$domain" -u "$USER_EXEC"
 get-alive-subdomains.sh -d "$domain" -u "$USER_EXEC"

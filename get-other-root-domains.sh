@@ -47,11 +47,13 @@ done
  fi
 
 
- LAST_INIT_DATE=$(cat "$PWD"/"${domain}"/last-init-date.txt)
- mkdir -p "${domain}"/"${LAST_INIT_DATE}"/tools-io
- dir=$PWD/${domain}/${LAST_INIT_DATE}
- bin=$dir/tools-io
+company_name=$(echo "${domain}" | cut -d . -f 1)
+ASNs=$(amass intel -org "${company_name}" | cut -f 1 -d , )
 
 
-amass intel -d "${domain}"-whois -o "${PWD}"/"${domain}"/roots.txt
+while read -r ASN ; do
+
+amass intel -active -asn "${ASN}" >> "${PWD}"/"${domain}"/roots.txt
+done < ${ASNs}
+
 sort "${PWD}"/"${domain}"/roots.txt | uniq > "${PWD}"/"${domain}"/tmp_roots.txt && mv "${PWD}"/"${domain}"/tmp_roots.txt "${PWD}"/"${domain}"/roots.txt
