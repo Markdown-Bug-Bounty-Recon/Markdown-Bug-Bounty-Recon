@@ -42,8 +42,8 @@
 - **I don't want to** focus on brute-forcing mainly, because in the end everyone does that, but someday I'll get down to it
 ## TODO
 - [ ] Create separate docker container for this script to run
-- [ ] Using Amass intel to get the company ASN number and more root domains
-- [ ] Implement parallelism with ```parallel```
+- [ x ] Using Amass intel to get the company ASN number and more root domains
+- [ x ] Implement parallelism with ```parallel```
 - [ ] Develop nuclei scanning more to take into account the output of get-technologies.sh
 - [ ] Convert output to JSON format and store it somewhere with ```jq```. It definetely would be more fail-proof than having plaintext results redirected to markdown format.
 - [ ] Record reports by date and check if there're any new findings worth to check out - can be done with implementing JSON format and then moving on with that further
