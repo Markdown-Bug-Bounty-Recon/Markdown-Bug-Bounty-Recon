@@ -98,7 +98,7 @@ while read -r domain; do
 	mkdir -p "${domain}"/"${LAST_INIT_DATE}"/"$domain"/tools-io
 	dir=$PWD/${domain}/${LAST_INIT_DATE}/"$domain"
 	bin=$dir/tools-io
-	
+
 			# We do the same thing as in get-subdomains-passively.sh again, but this time with -active flag
 		amass enum -active -d "${domain}" -o "$bin"/"${domain}"_subdomains_amass.txt
 		cat "$bin"/"${domain}"_subdomains_amass.txt >> "$bin"/"${domain}"_subdomains.txt
@@ -113,7 +113,7 @@ while read -r domain; do
  touch "$bin"/"${domain}"_alive-subdomain_bruting_amass.txt
 
  # Amass bruting
- parallel -a "$bin"/"${domain}"_alive_subdomains_without_protocol.txt-l 1 -j 10 -k --verbose amass enum -brute -d {} -o "$bin"/"${domain}"_subdomain_bruting_amass.txt
+ parallel -a "$bin"/"${domain}"_alive_subdomains_without_protocol.txt -l 1 -j 10 -k --verbose amass enum -brute -d {} -o "$bin"/"${domain}"_subdomain_bruting_amass.txt
 
 
  sort "$bin"/"${domain}"_subdomain_bruting_amass.txt | uniq | tee "$bin"/"${domain}"_tmp_subdomain_bruting_amass.txt && mv "$bin"/"${domain}"_tmp_subdomain_bruting_amass.txt "$bin"/"${domain}"_subdomain_bruting_amass.txt

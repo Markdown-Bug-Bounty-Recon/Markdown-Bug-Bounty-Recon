@@ -51,9 +51,13 @@ company_name=$(echo "${domain}" | cut -d . -f 1)
 ASNs=$(amass intel -org "${company_name}" | cut -f 1 -d , )
 
 
-while read -r ASN ; do
 
-amass intel -active -asn "${ASN}" >> "${PWD}"/"${domain}"/roots.txt
-done < ${ASNs}
 
+
+parallel -l 1 -j 10 -k --verbose amass intel -active -asn {} >> "${PWD}"/"${domain}"/roots.txt ::: $ASNs &
+pid=$!
+
+while kill -0 $pid 2> /dev/null; do
 sort "${PWD}"/"${domain}"/roots.txt | uniq > "${PWD}"/"${domain}"/tmp_roots.txt && mv "${PWD}"/"${domain}"/tmp_roots.txt "${PWD}"/"${domain}"/roots.txt
+sleep 30
+done
