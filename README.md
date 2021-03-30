@@ -48,5 +48,5 @@
 - [ ] Record reports by date and check if there're any new findings worth to check out - can be done with implementing JSON format and then moving on with that further
 - [ ] Make separate shodan script with API keys
 - [ ] Make this script more colourful!
-- [ ] Use bbrf for defining out-of-scope sudomains, domains
+- [ ] Define out of scope addresses with the help of regex expressions (and grex to generate them)
 - [ ] Notifications via Slack channel
