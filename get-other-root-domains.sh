@@ -54,7 +54,7 @@ ASNs=$(amass intel -org "${company_name}" | cut -f 1 -d , )
 
 
 
-parallel -l 1 -j 10 -k --verbose amass intel -active -asn {} >> "${PWD}"/"${domain}"/roots.txt ::: $ASNs &
+parallel -l 1 -j 10 -k --verbose amass intel -active -asn {} >> "${PWD}"/"${domain}"/roots.txt ::: "${ASNs}" &
 pid=$!
 
 while kill -0 $pid 2> /dev/null; do
