@@ -60,7 +60,7 @@ function yes_or_no {
  fi
 
 
-scope-adding.sh -d $domain
+scope-adding.sh -d "$domain"
 
 CURRENTDATE=$(date +"%Y-%m-%d")
 echo "$CURRENTDATE" > "$PWD"/"${domain}"/last-init-date.txt
