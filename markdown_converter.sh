@@ -2,8 +2,10 @@
 
 
 
-dir=$PWD
-bin=$dir/bin
+
+
+dir=$PWD/${domain}/${LAST_INIT_DATE}/"$domain"
+bin=$dir/tools-io
 
 mkdir "${dir}"/markdown
 markdown_dir=${dir}/markdown
@@ -12,7 +14,6 @@ markdown_dir=${dir}/markdown
 
 while read -r domain; do
 
-bin=$dir/bin/$domain
 
 mkdir "${dir}"/markdown/"${domain}"
 markdown_dir=${dir}/markdown/${domain}
@@ -28,7 +29,7 @@ sed -i "s/^/- [ ] /" "${markdown_dir}"/"${domain}"_subdomains.txt
 mv "${markdown_dir}"/"${domain}"_subdomains.txt "${markdown_dir}"/"${domain}"_subdomains.mdpp
 {
 echo "# ${domain}"
-wget -qO- "https://raw.githubusercontent.com/Cloufish/Bug-bounty/master/bugbounty_checklist.md" 
+wget -qO- "https://raw.githubusercontent.com/Cloufish/Bug-bounty/master/bugbounty_checklist.md"
 } >> "${markdown_dir}"/"${domain}"_report.mdpp
 
 {
@@ -122,6 +123,6 @@ echo -e "!INCLUDE \"${markdown_dir}/${domain}/${domain}_report.mdpp\"" >> "${mar
 
 
 
-done < "${bin}"/roots.txt
+done < "${PWD}"/"${domain}"/roots.txt
 
 markdown-pp "${markdown_dir}"/BUG_BOUNTY_REPORT_"${date}".mdpp -o "${markdown_dir}"/BUG_BOUNTY_REPORT_"${date}".md

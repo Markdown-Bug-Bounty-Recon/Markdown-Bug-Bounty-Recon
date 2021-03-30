@@ -59,26 +59,8 @@ function yes_or_no {
  	USER_EXEC=root
  fi
 
-if [ -f ./"${domain}"/scope.txt ];
-then
-  echo "DECLARING SCOPE OF YOUR PROGRAM"
-  yes_or_no "Do you want to declare it? [Y/N]"
-  if  yes_or_no;
-  then
-    vim ./"${domain}"/scope.txt
-  fi
-fi
 
-if [ -f ./"${domain}"/out-of-scope.txt ];
-then
-  echo "DECLARING OUT OF SCOPE OF YOUR PROGRAM"
-  yes_or_no "Do you want to declare it? [Y/N]"
-  if  yes_or_no;
-  then
-    vim ./"${domain}"/out-of-scope.txt
-  fi
-fi
-
+scope-adding.sh -d $domain
 
 CURRENTDATE=$(date +"%Y-%m-%d")
 echo "$CURRENTDATE" > "$PWD"/"${domain}"/last-init-date.txt
@@ -86,7 +68,7 @@ mkdir -p "${domain}"/"${CURRENTDATE}"/"$domain"/tools-io
 
 echo "${ASN}" > ./"${domain}"/asn.txt
 
-if [ -f "./${domain}/Acquisitions.txt" ];then
+if ! [ -f "./${domain}/Acquisitions.txt" ];then
 	echo "There's already text file for Acquisitions"
 else
 	echo "Do you want to create Acquisitions.txt file to include"

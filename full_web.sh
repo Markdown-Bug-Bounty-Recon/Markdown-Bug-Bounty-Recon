@@ -25,7 +25,7 @@ usage(){
 #	esac
 #done
 
-while getopts d:a:u: OPTION; do
+while getopts d:a:u:p OPTION; do
 	case $OPTION in
 		d)
 		domain="$OPTARG"
@@ -35,6 +35,9 @@ while getopts d:a:u: OPTION; do
 		;;
 		u)
 		USER_EXEC="$OPTARG"
+		;;
+		p)
+		NO_BRUTE=1
 		;;
 		?)
 		usage
@@ -48,6 +51,8 @@ get-technologies.sh -d "$domain" -u "$USER_EXEC"
 get-subdomains-passively.sh -d "$domain" -u "$USER_EXEC"
 get-alive-subdomains.sh -d "$domain" -u "$USER_EXEC"
 get-not-alive-subdomains-ip.sh -d "$domain" -u "$USER_EXEC"
-bruting-not-alive-subdomains-ip.sh -d "$domain" -u "$USER_EXEC"
 extracting-javascript.sh -d "$domain" -u "$USER_EXEC"
-bruting-alive-subdomains.sh -d "$domain" -u "$USER_EXEC"
+if [ $NO_BRUTE -ne 1 ]; then
+	bruting-not-alive-subdomains-ip.sh -d "$domain" -u "$USER_EXEC"
+	bruting-alive-subdomains.sh -d "$domain" -u "$USER_EXEC"
+fi
