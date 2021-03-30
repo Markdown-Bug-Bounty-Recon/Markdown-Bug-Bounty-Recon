@@ -9,7 +9,7 @@
 
 ## How to use this framework?
 1. The easiest way is to use my docker container [blackarch-zsh](https://github.com/Cloufish/blackarch-zsh-container), create the ```~/Pentesting``` directory on the host machine and run the container
-2. Then on the docker container change directory to this ```~/Pentesting``` directory and execute ```sudo full-web.sh -d ${domain} -u ${USER-EXEC}``` where ${domain} is your target domain and ${USER-EXEC} is the username home directory name **this is important, because otherwise finding would be put in /home/root/  which is not-intented``` (and I don't know how to remove the necessity of declaring this -u flag other than not executing as root)
+2. Then on the docker container change directory to this ```~/Pentesting``` directory and execute ```sudo full-web.sh -d ${domain} -u ${USER-EXEC}``` where ${domain} is your target domain and ${USER-EXEC} is the username home directory name **this is important, because otherwise finding would be put in /home/root/  which is not-intented**  (and I don't know how to remove the necessity of declaring this -u flag other than not executing as root)
 ## For now though I'll present to you what each script does:
 
 ### full_web.sh
