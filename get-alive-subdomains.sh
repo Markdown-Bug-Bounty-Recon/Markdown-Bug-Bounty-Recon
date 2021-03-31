@@ -122,4 +122,5 @@ while read -r domain; do
  cat "$bin"/"${domain}"_subdomain_bruting_amass.txt >> "$bin"/"${domain}"_alive_subdomains.txt
 
   <"$bin"/"${domain}"_alive_subdomains.txt favfreak.py -o "$bin"/"${domain}"_favfreak
+
 done < "${PWD}"/"${domain}"/roots.txt

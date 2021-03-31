@@ -30,3 +30,8 @@ then
     vim ./"${domain}"/out-of-scope.txt
   fi
 fi
+
+
+grex -f ./"${domain}"/scope.txt > ./"${domain}"/scope.regx
+
+grex -f ./"${domain}"/out-of-scope.txt > ./"${domain}"/out-of-scope.regx
