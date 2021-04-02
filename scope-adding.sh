@@ -11,6 +11,17 @@ while getopts d:a:u: OPTION; do
 	esac
 done
 
+function yes_or_no {
+    while true; do
+        read -r "$* [y/n]: " yn
+        case $yn in
+            [Yy]*) return 0  ;;
+            [Nn]*) echo "Aborted" ; return  1 ;;
+        esac
+    done
+}
+
+
 if ! [ -f ./"${domain}"/scope.txt ];
 then
   echo "DECLARING SCOPE OF YOUR PROGRAM"
