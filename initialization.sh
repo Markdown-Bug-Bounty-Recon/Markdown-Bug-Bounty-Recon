@@ -45,16 +45,6 @@ while getopts d:a:u: OPTION; do
 	esac
 done
 
-function yes_or_no {
-    while true; do
-        read -r "$* [y/n]: " yn
-        case $yn in
-            [Yy]*) return 0  ;;
-            [Nn]*) echo "Aborted" ; return  1 ;;
-        esac
-    done
-}
-
  if [ -z "${USER_EXEC}" ]; then
  	USER_EXEC=root
  fi
