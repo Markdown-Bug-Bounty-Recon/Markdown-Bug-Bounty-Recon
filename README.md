@@ -5,7 +5,7 @@
 - Puts every specific-subdomain data to particular folder associated with that subdomain, If you get comfortable with the directory structure then using this script will be a lot easier
 - The concept of this script is to convert all findings into one Markdown report, then you can import this report to ```Notion```, share this file with others and then collaborate easier
 - I want to make it run parallel
-- No Cloud subscription required. I want these script to run locally in the background with 0$ 
+- No Cloud subscription required. I want these script to run locally in the background with 0$
 
 ## How to use this framework?
 1. The easiest way is to use my docker container [blackarch-zsh](https://github.com/Cloufish/blackarch-zsh-container), create the ```~/Pentesting``` directory on the host machine and run the container
@@ -28,11 +28,11 @@
 ### extracting-javascript.sh
 - This will extract javascript from the website, and also search for other sources
 - **Still in progress**
-### bruting-alive-subdomains.sh 
+### bruting-alive-subdomains.sh
 - This will brute and test alive subdomains with nuclei
 - **Still in progress**
 ### markdown_converter.sh
-- This converts the contents of tools-io directory to markdown 
+- This converts the contents of tools-io directory to markdown
 - **This breaks a lot**, because with every new functionality I need to change this markdown-converter, so It doesn't cover much of the brute-forcing part.
 ## On which topics and subject I'll focus for now?
 - Definetely finding more root domains and subdomain enumeration, also discovering technologies and ways to use that data
@@ -46,7 +46,7 @@
 - [ ] Develop nuclei scanning more to take into account the output of get-technologies.sh
 - [ ] Convert output to JSON format and store it somewhere with ```jq```. It definetely would be more fail-proof than having plaintext results redirected to markdown format.
 - [ ] Record reports by date and check if there're any new findings worth to check out - can be done with implementing JSON format and then moving on with that further
-- [x] Make separate shodan script with API keys
-- [ ] Make this script more colourful!
+- [] Make separate shodan script with API keys
+- [x] Make this script more colourful!
 - [ ] Define out of scope addresses with the help of regex expressions (and grex to generate them)
 - [ ] Notifications via Slack channel
