@@ -50,11 +50,11 @@ done
  fi
 
 
-scope-adding.sh -d "$domain"
-
 CURRENTDATE=$(date +"%Y-%m-%d")
 echo "$CURRENTDATE" > "$PWD"/"${domain}"/last-init-date.txt
 mkdir -p "${domain}"/"${CURRENTDATE}"/"$domain"/tools-io
+
+scope-adding.sh -d "$domain"
 
 echo "${ASN}" > ./"${domain}"/asn.txt
 

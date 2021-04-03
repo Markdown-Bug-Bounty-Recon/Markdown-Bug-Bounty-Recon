@@ -22,25 +22,26 @@ function yes_or_no {
 }
 
 
-if ! [ -f ./"${domain}"/scope.txt ];
-then
-  echo "DECLARING SCOPE OF YOUR PROGRAM"
-  yes_or_no "Do you want to declare it? [Y/N]"
-  if  yes_or_no;
-  then
-    vim ./"${domain}"/scope.txt
-  fi
-fi
+#if ! [ -f ./"${domain}"/scope.txt ];
+#then
+#  echo "DECLARING SCOPE OF YOUR PROGRAM"
+#  yes_or_no "Do you want to declare it? [Y/N]" && vim ./"${domain}"/scope.txt
+#fi
 
-if ! [ -f ./"${domain}"/out-of-scope.txt ];
-then
-  echo "DECLARING OUT OF SCOPE OF YOUR PROGRAM"
-  yes_or_no "Do you want to declare it? [Y/N]"
-  if  yes_or_no;
-  then
-    vim ./"${domain}"/out-of-scope.txt
-  fi
-fi
+#if ! [ -f ./"${domain}"/out-of-scope.txt ];
+#then
+#  echo "DECLARING OUT OF SCOPE OF YOUR PROGRAM"
+#  yes_or_no "Do you want to declare it? [Y/N]" && vim ./"${domain}"/out-of-scope.txt
+
+#fi
+
+echo "DECLARING SCOPE OF YOUR PROGRAM"
+read -e -p "Do you want to declare it? [Y/N]: " choice
+[[ "$choice" == [Yy]* ]] && vim ./"${domain}"/scope.txt || echo "that was a no"
+
+echo "DECLARING OUT OF SCOPE OF YOUR PROGRAM"
+read -e -p "Do you want to declare it? [Y/N]: " choice
+[[ "$choice" == [Yy]* ]] && vim ./"${domain}"/out-of-scope.txt || echo "that was a no"
 
 
 grex -f ./"${domain}"/scope.txt > ./"${domain}"/scope.regx
