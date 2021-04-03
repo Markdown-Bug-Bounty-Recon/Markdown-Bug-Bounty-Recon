@@ -40,7 +40,7 @@
 - Being the most accurate, **NOT FOLLOWING THE PHILOSOPHY "BRUTE SPRAY AND PRAY"**
 - **I don't want to** focus on brute-forcing mainly, because in the end everyone does that, but someday I'll get down to it
 ## TODO
-- [ ] Create separate docker container for this script to run
+- [x] Create separate docker container for this script to run
 - [x] Using Amass intel to get the company ASN number and more root domains
 - [x] Implement parallelism with ```parallel```
 - [ ] Develop nuclei scanning more to take into account the output of get-technologies.sh
