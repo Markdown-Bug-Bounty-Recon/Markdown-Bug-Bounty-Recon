@@ -36,12 +36,17 @@ function yes_or_no {
 #fi
 
 echo "DECLARING SCOPE OF YOUR PROGRAM"
-read -e -p "Do you want to declare it? [Y/N]: " choice
+read -r -e -p "Do you want to declare it? [Y/N]: " choice
 [[ "$choice" == [Yy]* ]] && vim ./"${domain}"/scope.txt || echo "that was a no"
 
 echo "DECLARING OUT OF SCOPE OF YOUR PROGRAM"
-read -e -p "Do you want to declare it? [Y/N]: " choice
+read -r -e -p "Do you want to declare it? [Y/N]: " choice
 [[ "$choice" == [Yy]* ]] && vim ./"${domain}"/out-of-scope.txt || echo "that was a no"
+
+
+#Removing 'http://www.' prefixes and replacing them with "*." for the grex
+cat ./"${domain}"/scope.txt | grep http | cut -d . -f 2- | awk '{print "*."$0}'
+cat ./"${domain}"/out-of-scope.txt | grep http | cut -d . -f 2- | awk '{print "*."$0}'
 
 
 grex -f ./"${domain}"/scope.txt > ./"${domain}"/scope.regx

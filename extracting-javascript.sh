@@ -69,16 +69,15 @@ while read -r domain; do
 
 		wait
 
-		bin=$dir/tools-io/alive_"${alive_subdomain_folder_name}"/javascript_work/
-		gau "${alive_subdomain}" |grep -iE '\.js'|grep -ivE '\.json'|sort -u  >> "${bin}"/scripts/"${alive_subdomain_folder_name}"JS.txt
+#		bin=$dir/tools-io/alive_"${alive_subdomain_folder_name}"/javascript_work/
+#		gau "${alive_subdomain}" |grep -iE '\.js'|grep -ivE '\.json'|sort -u  >> "${bin}"/scripts/"${alive_subdomain_folder_name}"JS.txt
 		#< "${bin}"/scripts/"${alive_subdomain_folder_name}"JS.txt xargs -n2 -I@ bash -c "echo -e '\n[URL]: @\n';linkfinder -i @ -o cli" >> "${bin}"/endpoints/"${alive_subdomain_folder_name}"PathsWithUrl.txt
-		< "${bin}"/endpoints/"${alive_subdomain_folder_name}"PathsWithUrl.txt grep -iv '[URL]:'||sort -u > "${bin}"/no-endpoints/"${alive_subdomain_folder_name}"/paypalJSPathsNoUrl.txt
-		< "${bin}"/no-endpoints/"${alive_subdomain_folder_name}"/"${alive_subdomain_folder_name}"JSPathsNoUrl.txt python3 collector.py "${bin}"/output/"${alive_subdomain_folder_name}"_output
+#		< "${bin}"/endpoints/"${alive_subdomain_folder_name}"PathsWithUrl.txt grep -iv '[URL]:'||sort -u > "${bin}"/no-endpoints/"${alive_subdomain_folder_name}"/paypalJSPathsNoUrl.txt
+#		< "${bin}"/no-endpoints/"${alive_subdomain_folder_name}"/"${alive_subdomain_folder_name}"JSPathsNoUrl.txt python3 collector.py "${bin}"/output/"${alive_subdomain_folder_name}"_output
 
-		getsrc "${alive_subdomain}" >> "${bin}"/script-links/"${alive_subdomain_folder_name}"_output
+#		getsrc "${alive_subdomain}" >> "${bin}"/script-links/"${alive_subdomain_folder_name}"_output
 		#< "${bin}"/scripts/"${alive_subdomain_folder_name}"JS.txt xargs -n2 -I @ bash -c 'echo -e "\n[URL] @\n";python3 linkfinder -i @ -o cli' >> "${bin}"/secrets/"${alive_subdomain_folder_name}"JSSecrets.txt
-
-		ffuf -u https://www.paypalobjects.com/js/ -w /home/penelope/SecLists/Javascript-URLs/js-wordlist.txt -t 200 >> "${bin}"/endpoints/"${alive_subdomain_folder_name}"PathsWithUrl.txt
+# ffuf -u "${alive_subdomain}" -w /home/penelope/SecLists/Javascript-URLs/js-wordlist.txt -t 200 >> "${bin}"/endpoints/"${alive_subdomain_folder_name}"PathsWithUrl.txt
 
 
 	done < "$bin"/"${domain}"_alive_subdomains.txt

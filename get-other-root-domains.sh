@@ -1,7 +1,5 @@
 #!/bin/bash
 
-#!/bin/bash -x
-
 usage(){
 
 	echo "Usage: $0 [-d DOMAIN]" >&2

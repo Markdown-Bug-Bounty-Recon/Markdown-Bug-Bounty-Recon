@@ -66,7 +66,7 @@ get-alive-subdomains.sh -d "$domain" -u "$USER_EXEC"
 echo -e "${magentCl} GET-NOT-ALIVE-SUBDOMAINS.sh ${endCl}"
 get-not-alive-subdomains-ip.sh -d "$domain" -u "$USER_EXEC"
 echo -e "${cyanCl} EXTRACTING-JAVASCRIPT.sh ${endCl}"
-extracting-javascript.sh -d "$domain" -u "$USER_EXEC"
+# extracting-javascript.sh -d "$domain" -u "$USER_EXEC"
 if [ $NO_BRUTE -ne 1 ]; then
 	echo -e "${redCl} BRUTING-NOT-ALIVE-SUBDOMAINS.sh ${endCl}"
 	bruting-not-alive-subdomains-ip.sh -d "$domain" -u "$USER_EXEC"
