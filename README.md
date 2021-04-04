@@ -34,6 +34,7 @@
 ### markdown_converter.sh
 - This converts the contents of tools-io directory to markdown
 - **This breaks a lot**, because with every new functionality I need to change this markdown-converter, so It doesn't cover much of the brute-forcing part.
+- The main concept is that It keeps all the findings dynamically updating (new subdomains etc.), but the ```notes.mdpp``` is static and only you will be filling its content!
 ## On which topics and subject I'll focus for now?
 - Definetely finding more root domains and subdomain enumeration, also discovering technologies and ways to use that data
 - Also managing scope, detecting the scope of the program, put a massive distinction between passive scanning and active scanning to not make bug-bounty programs angry! D:
