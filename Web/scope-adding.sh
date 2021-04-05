@@ -45,8 +45,8 @@ read -r -e -p "Do you want to declare it? [Y/N]: " choice
 
 
 #Removing 'http://www.' prefixes and replacing them with "*." for the grex
-cat ./"${domain}"/scope.txt | grep http | cut -d . -f 2- | awk '{print "*."$0}'
-cat ./"${domain}"/out-of-scope.txt | grep http | cut -d . -f 2- | awk '{print "*."$0}'
+< ./"${domain}"/scope.txt | grep http | cut -d . -f 2- | awk '{print "*."$0}'
+< ./"${domain}"/out-of-scope.txt | grep http | cut -d . -f 2- | awk '{print "*."$0}'
 
 
 grex -f ./"${domain}"/scope.txt > ./"${domain}"/scope.regx
