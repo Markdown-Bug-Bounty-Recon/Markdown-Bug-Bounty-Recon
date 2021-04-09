@@ -65,22 +65,10 @@ Vagrant.configure("2") do |config|
   # documentation for more information about their specific syntax and use.
   Vagrant.configure("2") do |config|
     # ... other configuration
-
-    config.vm.provision "file", source: "./.pacman.conf", destination: "/etc/pacman.conf"
-
+    config.vm.provision "file", source: "./.sudoers", destination: "sudoers"
+    config.vm.provision "file", source: "./.pacman.conf", destination: "pacman.conf"
   end
-  Vagrant.configure("2") do |config|
-    # ... other configuration
 
-    config.vm.provision "file", source: "./.entrypoint.sh", destination: "/"
-
-  end
-  Vagrant.configure("2") do |config|
-    # ... other configuration
-
-    config.vm.provision "file", source: "./.sudoers", destination: "/etc/sudoers"
-
-  end
 
    config.vm.provision "shell", path: ".setup.sh"
 end
