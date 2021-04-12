@@ -88,11 +88,12 @@ while read -r domain; do
 		 mkdir -p "${markdown_dir}"/alive_"${alive_subdomain_folder_name}"
 		 touch "${markdown_dir}"/alive_"${alive_subdomain_folder_name}"/notes.mdpp
 		 touch "${markdown_dir}"/alive_"${alive_subdomain_folder_name}"/report_"${alive_subdomain_folder_name}".mdpp
-		 echo "### ${alive_subdomain}" >> "${markdown_dir}"/alive_"${alive_subdomain_folder_name}"/report_"${alive_subdomain_folder_name}".mdpp
 
+		 {
+		 echo "### ${alive_subdomain}"
 		 echo "### NOTES" >> "${markdown_dir}"/alive_"${alive_subdomain_folder_name}"/report_"${alive_subdomain_folder_name}".mdpp
 		 echo "!INCLUDE \"${markdown_dir}/alive_${alive_subdomain_folder_name}/notes.mdpp\"" >> "${markdown_dir}"/alive_"${alive_subdomain_folder_name}"/report_"${alive_subdomain_folder_name}".mdpp
-
+	 } >> "${markdown_dir}"/alive_"${alive_subdomain_folder_name}"/report_"${alive_subdomain_folder_name}".mdpp
 
 	 done < "${bin}"/"${domain}"_alive_subdomains.txt
 		  #PUTTING ALL SUBDOMAIN REPORTS TOGETHER INTO DOMAIN REPORT
