@@ -46,8 +46,7 @@
 - [x] Using Amass intel to get the company ASN number and more root domains
 - [x] Implement parallelism with ```parallel```
 - [ ] Develop nuclei scanning more to take into account the output of get-technologies.sh
-- [ ] Convert output to JSON format and store it somewhere with ```jq```. It definetely would be more fail-proof than having plaintext results redirected to markdown format.
-- [ ] Record reports by date and check if there're any new findings worth to check out - can be done with implementing JSON format and then moving on with that further
+- [ ] Record reports by date and check if there're any new findings worth to check out - Can be done with executing ```sdiff``` on each file in ```tools-io/``` but also with comparing markdown report
 - [ ] Also make the possibility to include ignore.txt file to ignore these new findings ( If We want to prevent them from appearing )
 - [ ] Make separate shodan script with API key
 - [x] Make this script more colourful!
