@@ -26,8 +26,6 @@ pacman --needed --noconfirm -Syu curl \
 		man-db \
 		lolcat \
 		figlet \
-    chsh \
-    chpasswd \
 		nodejs \
 		base-devel \
 		yarn \

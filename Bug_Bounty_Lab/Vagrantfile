@@ -43,7 +43,7 @@ Vagrant.configure("2") do |config|
   # the path on the host to the actual folder. The second argument is
   # the path on the guest to mount the folder. And the optional third
   # argument is a set of non-required options.
-  config.vm.synced_folder "./Bug_Bounty_Programs", "/home/penelope/Bug_Bounty_Programs"
+  config.vm.synced_folder "./Bug_Bounty_Programs", "/home/penelope/Bug_Bounty_Programs", type: "virtualbox"
 
   # Provider-specific configuration so you can fine-tune various
   # backing providers for Vagrant. These expose provider-specific options.
@@ -65,8 +65,9 @@ Vagrant.configure("2") do |config|
   # documentation for more information about their specific syntax and use.
   Vagrant.configure("2") do |config|
     # ... other configuration
-    config.vm.provision "file", source: "./.sudoers", destination: "sudoers"
-    config.vm.provision "file", source: "./.pacman.conf", destination: "pacman.conf"
+    config.vm.provision "file", source: ".sudoers", destination: "/etc/sudoers"
+    config.vm.provision "file", source: ".pacman.conf", destination: "/usr/local/etc/pacman.conf"
+    config.vm.provision "file", source: ".setup.sh", destination: "/home/vagrant/setup.sh"
   end
 
 
