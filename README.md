@@ -41,15 +41,17 @@
 - Being the most accurate, **NOT FOLLOWING THE PHILOSOPHY "BRUTE SPRAY AND PRAY"**
 - **I don't want to** focus on brute-forcing mainly, because in the end everyone does that, but someday I'll get down to it
 ## TODO
-- [x] Create separate docker container for this script to run
-- [ ] Make it so the bug-bounty-framework container exits when the script finishes
+- [ ] Create separate docker container for this script to run and make it with set ```cron```
 - [x] Using Amass intel to get the company ASN number and more root domains
 - [x] Implement parallelism with ```parallel```
-- [ ] Develop nuclei scanning more to take into account the output of get-technologies.sh
+- [ ] Include get-technologies.sh output in markdown
 - [ ] Record reports by date and check if there're any new findings worth to check out - Can be done with executing ```sdiff``` on each file in ```tools-io/``` but also with comparing markdown report
 - [ ] Also make the possibility to include ignore.txt file to ignore these new findings ( If We want to prevent them from appearing )
 - [ ] Make separate shodan script with API key
 - [x] Make this script more colourful!
+- [ ] Redirect unneceseary output to /dev/null in favor of ```-o``` flag whenever possible
 - [ ] Define out of scope addresses with the help of regex expressions (and grex to generate them)
+- [ ] Make it so the any setting performed in docker container with ```docker attach``` is persistent when doing a reboot, or store and copy the configs between Host and Container
 - [ ] Notifications via Slack channel
 - [ ] Backups of the data (Mainly reports)
+- [ ] Use EyeWitness
