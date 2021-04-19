@@ -56,7 +56,7 @@
 - [ ] Redirect unneceseary output to /dev/null in favor of ```-o``` flag whenever possible
 - [ ] Define out of scope addresses with the help of regex expressions (and grex to generate them)
 - [ ] Make it so the any setting performed in docker container with ```docker attach``` is persistent when doing a reboot, or store and copy the configs between Host and Container
-- [ ] Also have a way to manage ```$SECRET_TOKENS``` in a secure and simple manner
+- [ ] Also have a way to manage ```$SECRET_TOKENS``` in a secure and simple manner, probably with [env-files] (https://docs.docker.com/engine/reference/commandline/run/#set-environment-variables--e---env---env-file) while on the Host machine have a bash script/docs on how to assign them
 - [ ] Notifications via Slack channel
 - [ ] Separate things put in recon and things put on Slack - The markdown report should be source of information - not the source for 'Incident Response'(? xD) when nuclei or ZAP finds anything
 - [ ] Implement ZAP with their Automation Framework
