@@ -46,11 +46,13 @@
 - [x] Implement parallelism with ```parallel```
 - [ ] Include get-technologies.sh output in markdown
 - [ ] Implement uploading to imgur via their API
+- [ ] Integrate nuclei scanning
 - [ ] Record reports by date and check if there're any new findings worth to check out - Can be done with executing ```sdiff``` on each file in ```tools-io/``` but also with comparing markdown report
 - [ ] Make directory for Notes separate - after all the files in there would be filled the most frequent
 - [ ] Also make the possibility to include ignore.txt file to ignore these new findings ( If We want to prevent them from appearing )
 - [ ] Make separate shodan script with API key
 - [x] Make this script more colourful!
+- [ ] Jeez, just get ``` extracting-javascript.sh``` working!!!
 - [ ] Redirect unneceseary output to /dev/null in favor of ```-o``` flag whenever possible
 - [ ] Define out of scope addresses with the help of regex expressions (and grex to generate them)
 - [ ] Make it so the any setting performed in docker container with ```docker attach``` is persistent when doing a reboot, or store and copy the configs between Host and Container
