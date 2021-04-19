@@ -45,6 +45,7 @@
 - [x] Using Amass intel to get the company ASN number and more root domains
 - [x] Implement parallelism with ```parallel```
 - [ ] Include get-technologies.sh output in markdown
+- [ ] Implement uploading to imgur via their API
 - [ ] Record reports by date and check if there're any new findings worth to check out - Can be done with executing ```sdiff``` on each file in ```tools-io/``` but also with comparing markdown report
 - [ ] Also make the possibility to include ignore.txt file to ignore these new findings ( If We want to prevent them from appearing )
 - [ ] Make separate shodan script with API key
