@@ -47,6 +47,7 @@
 - [ ] Include get-technologies.sh output in markdown
 - [ ] Implement uploading to imgur via their API
 - [ ] Record reports by date and check if there're any new findings worth to check out - Can be done with executing ```sdiff``` on each file in ```tools-io/``` but also with comparing markdown report
+- [ ] Make directory for Notes separate - after all the files in there would be filled the most frequent
 - [ ] Also make the possibility to include ignore.txt file to ignore these new findings ( If We want to prevent them from appearing )
 - [ ] Make separate shodan script with API key
 - [x] Make this script more colourful!
@@ -54,5 +55,7 @@
 - [ ] Define out of scope addresses with the help of regex expressions (and grex to generate them)
 - [ ] Make it so the any setting performed in docker container with ```docker attach``` is persistent when doing a reboot, or store and copy the configs between Host and Container
 - [ ] Notifications via Slack channel
+- [ ] Separate things put in recon and things put on Slack - The markdown report should be source of information - not the source for 'Incident Response'(? xD) when nuclei or ZAP finds anything
+- [ ] Implement ZAP with their Automation Framework
 - [ ] Backups of the data (Mainly reports)
 - [ ] Use EyeWitness
