@@ -8,7 +8,7 @@
 - No Cloud subscription required. I want these script to run locally in the background with 0$
 
 ## How to use this framework?
-1. The easiest way is to use my docker container [blackarch-zsh](https://github.com/Cloufish/blackarch-zsh-container), create the ```~/Pentesting``` directory on the host machine and run the container
+1. The easiest way is to use my docker container [bug-bounty-framework](https://github.com/Cloufish/blackarch-zsh-container/tree/master/bug-bounty-framework-web), create the ```~/Pentesting``` directory on the host machine and run the container
 2. Then on the docker container change directory to this ```~/Pentesting``` directory and execute ```sudo full-web.sh -d ${domain} -u ${USER-EXEC}``` where ${domain} is your target domain and ${USER-EXEC} is the username home directory name **this is important, because otherwise finding would be put in /home/root/  which is not-intented**  (and I don't know how to remove the necessity of declaring this -u flag other than not executing as root)
 ## For now though I'll present to you what each script does:
 
@@ -54,6 +54,7 @@
 - [ ] Redirect unneceseary output to /dev/null in favor of ```-o``` flag whenever possible
 - [ ] Define out of scope addresses with the help of regex expressions (and grex to generate them)
 - [ ] Make it so the any setting performed in docker container with ```docker attach``` is persistent when doing a reboot, or store and copy the configs between Host and Container
+- [ ] Also have a way to manage ```$SECRET_TOKENS``` in a secure and simple manner
 - [ ] Notifications via Slack channel
 - [ ] Separate things put in recon and things put on Slack - The markdown report should be source of information - not the source for 'Incident Response'(? xD) when nuclei or ZAP finds anything
 - [ ] Implement ZAP with their Automation Framework
