@@ -1,4 +1,4 @@
-#!/bin/bash 
+#!/bin/bash
 
 usage(){
 
@@ -47,6 +47,11 @@ done
 
  if [ -z "${USER_EXEC}" ]; then
  	USER_EXEC=root
+ fi
+
+ if [ "$EUID" -ne 0 ]
+   then echo "Please run as root"
+   exit
  fi
 
 

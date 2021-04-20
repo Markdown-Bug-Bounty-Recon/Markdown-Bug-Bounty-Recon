@@ -21,6 +21,11 @@ function yes_or_no {
     done
 }
 
+if [ "$EUID" -ne 0 ]
+  then echo "Please run as root"
+  exit
+fi
+
 
 #if ! [ -f ./"${domain}"/scope.txt ];
 #then

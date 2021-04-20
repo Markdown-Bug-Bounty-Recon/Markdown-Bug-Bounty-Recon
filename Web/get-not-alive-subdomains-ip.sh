@@ -44,6 +44,10 @@ done
  	USER_EXEC=root
  fi
 
+ if [ "$EUID" -ne 0 ]
+   then echo "Please run as root"
+   exit
+ fi
 
  LAST_INIT_DATE=$(cat "$PWD"/"${domain}"/last-init-date.txt)
 

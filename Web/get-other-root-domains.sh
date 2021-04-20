@@ -44,6 +44,11 @@ done
  	USER_EXEC=root
  fi
 
+ if [ "$EUID" -ne 0 ]
+   then echo "Please run as root"
+   exit
+ fi
+
 
 company_name=$(echo "${domain}" | cut -d . -f 1)
 ASNs=$(amass intel -org "${company_name}" | cut -f 1 -d , )

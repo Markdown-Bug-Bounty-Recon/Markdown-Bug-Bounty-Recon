@@ -45,6 +45,15 @@ while getopts d:a:u:p OPTION; do
 	esac
 done
 
+if [ -z "${USER_EXEC}" ]; then
+ USER_EXEC=root
+fi
+
+if [ "$EUID" -ne 0 ]
+  then echo "Please run as root"
+  exit
+fi
+
 redCl="\e[0;31m\033[1m"
 greenCl="\e[0;32m\033[1m"
 yellowCl="\e[0;33m\033[1m"

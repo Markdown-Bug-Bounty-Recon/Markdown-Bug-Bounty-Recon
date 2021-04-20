@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 usage(){
 
 	echo "Usage: $0 [-d DOMAIN]" >&2
@@ -50,14 +49,16 @@ done
    exit
  fi
 
+
+
  LAST_INIT_DATE=$(cat "$PWD"/"${domain}"/last-init-date.txt)
 
-
 while read -r domain; do
-	mkdir -p "${domain}"/"${LAST_INIT_DATE}"/"$domain"/tools-io
-	dir=$PWD/${domain}/${LAST_INIT_DATE}/"$domain"
-	bin=$dir/tools-io
-	mkdir -p "$bin"/github-dorking-"${domain}"
+ dir=$PWD/${domain}/${LAST_INIT_DATE}/"$domain"
+ bin=$dir/tools-io/
 
-	gitdorker -t "$GITHUB_TOKEN" "$GITHUB_TOKEN2" -q "${domain}" -d /home/penelope/tools/SecLists/Github-Dorks/alldorksv3 -o "$bin"/github-dorking-"${domain}"/findings.txt
+ eyewitness -f "$bin"/"${domain}"_alive_subdomains.txt -d /tmp/Eyewitness
+ mkdir "${bin}"/Eyewitness
+ mv /tmp/Eyewitness "${bin}"/Eyewitness
+
 done < "${PWD}"/"${domain}"/roots.txt
