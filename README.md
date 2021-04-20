@@ -51,6 +51,7 @@
 - [ ] Make directory for Notes separate - after all the files in there would be filled the most frequent
 - [ ] Also make the possibility to include ignore.txt file to ignore these new findings ( If We want to prevent them from appearing )
 - [ ] Make separate shodan script with API key
+- [ ] Make basic documentation with ```docsify```
 - [x] Make this script more colourful!
 - [ ] Jeez, just get ``` extracting-javascript.sh``` working!!!
 - [ ] Redirect unneceseary output to /dev/null in favor of ```-o``` flag whenever possible
