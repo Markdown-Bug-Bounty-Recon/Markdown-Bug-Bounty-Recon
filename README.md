@@ -63,3 +63,4 @@
 - [ ] Implement ZAP with their Automation Framework
 - [ ] Backups of the data (Mainly reports)
 - [ ] Use EyeWitness
+- [ ] After some long time, let's replace markdown with ```rmarkdown```, add sweet charts, visualizations :)
