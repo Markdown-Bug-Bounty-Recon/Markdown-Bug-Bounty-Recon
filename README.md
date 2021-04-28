@@ -53,7 +53,7 @@
 - [ ] Make separate shodan script with API key
 - [ ] Make basic documentation with ```docsify```
 - [x] Make this script more colourful!
-- [ ] Jeez, just get ``` extracting-javascript.sh``` working!!! With ```scripthunter``` and ```jsmon``` to ```extracting_javascript.sh```
+- [ ] Jeez, just get ``` extracting-javascript.sh``` working!!! With ```scripthunter``` and ```jsmon```
 - [ ] Redirect unneceseary output to /dev/null in favor of ```-o``` flag whenever possible
 - [ ] Define out of scope addresses with the help of regex expressions (and grex to generate them)
 - [ ] Make it so the any setting performed in docker container with ```docker attach``` is persistent when doing a reboot, or store and copy the configs between Host and Container
