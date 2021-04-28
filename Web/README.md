@@ -52,4 +52,5 @@
 - [x] Make this script more colourful!
 - [ ] Define out of scope addresses with the help of regex expressions (and grex to generate them)
 - [ ] Notifications via Slack channel
+- [ ] Add ```scripthunter``` and ```jsmon``` to ```extracting_javascript.sh```
 - [ ] Backups of the data (Mainly reports)
