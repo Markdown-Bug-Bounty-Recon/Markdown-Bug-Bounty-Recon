@@ -51,14 +51,17 @@
 - [ ] Make directory for Notes separate - after all the files in there would be filled the most frequent
 - [ ] Also make the possibility to include ignore.txt file to ignore these new findings ( If We want to prevent them from appearing )
 - [ ] Make separate shodan script with API key
+- [ ] Make basic documentation with ```docsify```
 - [x] Make this script more colourful!
-- [ ] Jeez, just get ``` extracting-javascript.sh``` working!!!
+- [ ] Jeez, just get ``` extracting-javascript.sh``` working!!! With ```scripthunter``` and ```jsmon```
 - [ ] Redirect unneceseary output to /dev/null in favor of ```-o``` flag whenever possible
 - [ ] Define out of scope addresses with the help of regex expressions (and grex to generate them)
 - [ ] Make it so the any setting performed in docker container with ```docker attach``` is persistent when doing a reboot, or store and copy the configs between Host and Container
-- [ ] Also have a way to manage ```$SECRET_TOKENS``` in a secure and simple manner, probably with [env-files] (https://docs.docker.com/engine/reference/commandline/run/#set-environment-variables--e---env---env-file) while on the Host machine have a bash script/docs on how to assign them
+- [ ] Also have a way to manage ```$SECRET_TOKENS``` in a secure and simple manner, probably with [env-files](https://docs.docker.com/engine/reference/commandline/run/#set-environment-variables--e---env---env-file) while on the Host machine have a bash script/docs on how to assign them
 - [ ] Notifications via Slack channel
 - [ ] Separate things put in recon and things put on Slack - The markdown report should be source of information - not the source for 'Incident Response'(? xD) when nuclei or ZAP finds anything
 - [ ] Implement ZAP with their Automation Framework
 - [ ] Backups of the data (Mainly reports)
 - [ ] Use EyeWitness
+- [ ] After some long time, let's replace markdown with ```rmarkdown```, add sweet charts, visualizations :)
+- [ ] Integrate ```bbrf```
