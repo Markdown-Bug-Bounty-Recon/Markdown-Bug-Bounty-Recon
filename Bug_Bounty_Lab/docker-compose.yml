@@ -1,0 +1,29 @@
+version: '3.3'
+services:
+  bug-bounty-framework-web:
+    container_name: bug-bounty-framework-web
+    image: cloufish/bug-bounty-framework-web:latest
+    hostname: bug-bounty-framework-web
+    ports:
+      - '80:80'
+      - '20:20'
+      - '21:21'
+      - '22:22'
+      - '8080:8080'
+      - '1337:1337'
+      - '4444:4444'
+    stdin_open: true
+    tty: true
+    restart: unless-stopped
+    volumes:
+      - '~/Pentesting:/home/penelope/Pentesting'
+  
+
+  bbrf-server:
+    ports:
+      - '443:6984'
+    environment:
+      - COUCHDB_USER=penelope
+      - COUCHDB_PASSWORD=
+      - BBRF_PASSWORD=
+    image: honoki/bbrf-server
