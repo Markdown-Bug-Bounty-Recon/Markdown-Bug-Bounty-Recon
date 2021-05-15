@@ -63,6 +63,7 @@ scope-adding.sh -d "$domain"
 
 echo "${ASN}" > ./"${domain}"/asn.txt
 
+
 if ! [ -f "./${domain}/Acquisitions.txt" ];then
 	echo "There's already text file for Acquisitions"
 else

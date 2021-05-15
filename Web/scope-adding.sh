@@ -57,3 +57,11 @@ read -r -e -p "Do you want to declare it? [Y/N]: " choice
 grex -f ./"${domain}"/scope.txt > ./"${domain}"/scope.regx
 
 grex -f ./"${domain}"/out-of-scope.txt > ./"${domain}"/out-of-scope.regx
+
+while read -r in-scope; do
+	bbrf inscope add "${in-scope}"
+done < ./"${domain}"/scope.txt
+
+while read -r out-of-scope; do
+	bbrf inscope add "${out-of-scope}"
+done < ./"${domain}"/out-of-scope.txt
