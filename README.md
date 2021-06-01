@@ -55,8 +55,6 @@
 - **I don't want to** focus on brute-forcing mainly, because in the end everyone does that, but someday I'll get down to it
 ## TODO
 - [ ] Create separate docker container for this script to run and make it with set ```cron```
-- [x] Using Amass intel to get the company ASN number and more root domains
-- [x] Implement parallelism with ```parallel```
 - [ ] Include get-technologies.sh output in markdown
 - [ ] Implement uploading to imgur via their API
 - [ ] Integrate nuclei scanning
@@ -65,7 +63,6 @@
 - [ ] Also make the possibility to include ignore.txt file to ignore these new findings ( If We want to prevent them from appearing )
 - [ ] Make separate shodan script with API key
 - [ ] Make basic documentation with ```docsify```
-- [x] Make this script more colourful!
 - [ ] Jeez, just get ``` extracting-javascript.sh``` working!!! With ```scripthunter``` and ```jsmon```
 - [ ] Redirect unneceseary output to /dev/null in favor of ```-o``` flag whenever possible
 - [ ] Define out of scope addresses with the help of regex expressions (and grex to generate them)
@@ -78,3 +75,5 @@
 - [ ] Use EyeWitness
 - [ ] After some long time, let's replace markdown with ```rmarkdown```, add sweet charts, visualizations :)
 - [ ] Integrate ```bbrf```
+  - [X] Make bbrf-server communicate with bug-bounty-framework-web container
+  - [ ] Transform every script to use bbrf
