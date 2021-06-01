@@ -76,4 +76,5 @@
 - [ ] After some long time, let's replace markdown with ```rmarkdown```, add sweet charts, visualizations :)
 - [ ] Integrate ```bbrf```
   - [X] Make bbrf-server communicate with bug-bounty-framework-web container
-  - [ ] Transform every script to use bbrf
+  - [X] include `bbrf url add -` in getting subdomains at the end of the script
+  - [ ] Abandon the use of subdomain files and rely only on `bbrf urls` command. Make use of bbrf tags.
