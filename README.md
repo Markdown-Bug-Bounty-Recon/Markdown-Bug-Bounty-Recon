@@ -15,9 +15,7 @@
   "couchdb": "https://bbrf-server:6984/bbrf",
   "slack_token": "<a slack token to receive notifications>",
   "discord_webhook": "<your discord webhook if you want one>",
-  "ignore_ssl_errors": true,
-  "debug": true,
-  "program": "test"
+  "ignore_ssl_errors": true
 }
 ```
 
