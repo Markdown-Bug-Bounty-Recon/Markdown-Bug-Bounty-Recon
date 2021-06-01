@@ -17,13 +17,17 @@ services:
     restart: unless-stopped
     volumes:
       - '~/Pentesting:/home/penelope/Pentesting'
-  
+      - '~/.bbrf:/home/penelope/.bbrf'
+
 
   bbrf-server:
+    container_name: bbrf-server
     ports:
       - '443:6984'
     environment:
       - COUCHDB_USER=penelope
-      - COUCHDB_PASSWORD=
-      - BBRF_PASSWORD=
+      - COUCHDB_PASSWORD=penelope
+      - BBRF_PASSWORD=penelope
     image: honoki/bbrf-server
+    restart: unless-stopped
+    tty: true
