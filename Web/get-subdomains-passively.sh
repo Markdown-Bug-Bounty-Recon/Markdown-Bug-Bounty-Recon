@@ -49,6 +49,7 @@ done
    exit
  fi
 
+bbrf use "$(echo "${domain}" | cut -f 1 -d .)"
 
  LAST_INIT_DATE=$(cat "$PWD"/"${domain}"/last-init-date.txt)
 
@@ -56,9 +57,6 @@ while read -r domain; do
 	mkdir -p "${domain}"/"${LAST_INIT_DATE}"/"$domain"/tools-io
 	dir=$PWD/${domain}/${LAST_INIT_DATE}/"$domain"
 	bin=$dir/tools-io
-	## Wappalyzer / Listing Technologies
-	https_link=$(echo "${domain}" | httprobe)
-	node "/home/${USER_EXEC}/tools/wappalyzer/src/drivers/npm/cli.js" "$https_link" -P | jq '.technologies[].name' | tee "$bin"/"${domain}"_technologies.txt
 
  # MANY OF THESE TOOLS ARE COMMENTED, BECAUSE AMASS ALREADY OFFERS ENUMERATION FROM DIFFERENT OUTPUTS AND APIs!
 
@@ -74,7 +72,7 @@ while read -r domain; do
 
 
 	# Subdomain Scraping
-	amass enum -passive -d "${domain}" -o "$bin"/"${domain}"_subdomains_amass.txt &
+	bbrf scope in --wildcard --top | amass enum -passive -d "${domain}" -o "$bin"/"${domain}"_subdomains_amass.txt &
 	#subfinder -d "${domain}" -o "$bin"/"${domain}"_subdomains_subfinder.txt &
 	#curl "https://tls.bufferover.run/dns?q=.${domain}" 2>/dev/null | jq .Results | cut -d ',' -f 3 | tr -d '\"' | tr -d ']' | tr -d '[' | tee -a "$bin"/"${domain}"_subdomains_cloud.txt & # YES I KNOW THAT THESE 'TR' LOOK TERRIBLE, WILL CHANGE IT TO SED SOMEDAY OR GREP
 	wait
@@ -94,8 +92,9 @@ while read -r domain; do
 
 	sort "$bin"/"${domain}"_subdomains.txt | uniq | tee "$bin"/tmp_"${domain}"_subdomains.txt && mv "$bin"/tmp_"${domain}"_subdomains.txt "$bin"/"${domain}"_subdomains.txt
 
-	regex_out_of_scope=$( cat ./"${domain}"/out-of-scope.regx)
-	sed -i.old -E "/${regex_out_of_scope}/d" "$bin"/"${domain}"_subdomains.txt
+
+	#regex_out_of_scope=$( cat ./"${domain}"/out-of-scope.regx)
+	#sed -i.old -E "/${regex_out_of_scope}/d" "$bin"/"${domain}"_subdomains.txt
 
 
 

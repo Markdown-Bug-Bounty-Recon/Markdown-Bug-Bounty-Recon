@@ -27,41 +27,31 @@ if [ "$EUID" -ne 0 ]
 fi
 
 
-#if ! [ -f ./"${domain}"/scope.txt ];
-#then
-#  echo "DECLARING SCOPE OF YOUR PROGRAM"
-#  yes_or_no "Do you want to declare it? [Y/N]" && vim ./"${domain}"/scope.txt
-#fi
 
-#if ! [ -f ./"${domain}"/out-of-scope.txt ];
-#then
-#  echo "DECLARING OUT OF SCOPE OF YOUR PROGRAM"
-#  yes_or_no "Do you want to declare it? [Y/N]" && vim ./"${domain}"/out-of-scope.txt
+bbrf use "$(echo "${domain}" | cut -f 1 -d .)"
 
-#fi
-
-echo "DECLARING SCOPE OF YOUR PROGRAM"
+echo -n "# SPECIFY EACH OF THE SUBDOMAINS IN NEW LINES; ASTERISK (*) WILDCARDS ARE ALLOWED, BUT NOT REGEX; DO NOT USE HTTP/HTTPS EXTENSION FORMAT; WITH .COM | .PL | .DE AT THE END (THIS IS A MUST)" > ./"${domain}"/scope.txt
+echo "DECLARING SCOPE OF YOUR PROGRAM. YOU NEED TO DO THAT TO USE BBRF QUERYING"
 read -r -e -p "Do you want to declare it? [Y/N]: " choice
 [[ "$choice" == [Yy]* ]] && vim ./"${domain}"/scope.txt || echo "that was a no"
 
+echo -n "# SPECIFY EACH OF THE SUBDOMAINS IN NEW LINES; ASTERISK (*) WILDCARDS ARE ALLOWED, BUT NOT REGEX; DO NOT USE HTTP/HTTPS EXTENSION FORMAT; WITH .COM | .PL | .DE AT THE END (THIS IS A MUST)" > ./"${domain}"/out-of-scope.txt
 echo "DECLARING OUT OF SCOPE OF YOUR PROGRAM"
 read -r -e -p "Do you want to declare it? [Y/N]: " choice
 [[ "$choice" == [Yy]* ]] && vim ./"${domain}"/out-of-scope.txt || echo "that was a no"
 
+# Removing the comment in these files:
+sed -i '1d' ./"${domain}"/scope.txt
+sed -i '1d' ./"${domain}"/out-of-scope.txt
 
-#Removing 'http://www.' prefixes and replacing them with "*." for the grex
-< ./"${domain}"/scope.txt grep http | cut -d . -f 2- | awk '{print "*."$0}'
-< ./"${domain}"/out-of-scope.txt grep http | cut -d . -f 2- | awk '{print "*."$0}'
-
-
-grex -f ./"${domain}"/scope.txt > ./"${domain}"/scope.regx
-
-grex -f ./"${domain}"/out-of-scope.txt > ./"${domain}"/out-of-scope.regx
-
-while read -r in-scope; do
-	bbrf inscope add "${in-scope}"
+while read -r domain_in_scope 
+do
+    bbrf inscope add "${domain_in_scope}"
 done < ./"${domain}"/scope.txt
 
-while read -r out-of-scope; do
-	bbrf inscope add "${out-of-scope}"
+
+while read -r domain_of_of_scope 
+do
+    bbrf inscope add "${domain_of_of_scope}"
 done < ./"${domain}"/out-of-scope.txt
+
