@@ -7,6 +7,19 @@
 - I want to make it run parallel
 - No Cloud subscription required. I want these script to run locally in the background with 0$
 
+## ~/.bbrf/config.json
+```json
+{
+  "username": "bbrf",
+  "password": "penelope",
+  "couchdb": "https://bbrf-server:6984/bbrf",
+  "slack_token": "<a slack token to receive notifications>",
+  "discord_webhook": "<your discord webhook if you want one>",
+  "ignore_ssl_errors": true
+}
+```
+
+
 ## How to use this framework?
 1. The easiest way is to use my docker container [bug-bounty-framework](https://github.com/Cloufish/blackarch-zsh-container/tree/master/bug-bounty-framework-web), create the ```~/Pentesting``` directory on the host machine and run the container
 2. Then on the docker container change directory to this ```~/Pentesting``` directory and execute ```sudo full-web.sh -d ${domain} -u ${USER-EXEC}``` where ${domain} is your target domain and ${USER-EXEC} is the username home directory name **this is important, because otherwise finding would be put in /home/root/  which is not-intented**  (and I don't know how to remove the necessity of declaring this -u flag other than not executing as root)
@@ -42,8 +55,6 @@
 - **I don't want to** focus on brute-forcing mainly, because in the end everyone does that, but someday I'll get down to it
 ## TODO
 - [ ] Create separate docker container for this script to run and make it with set ```cron```
-- [x] Using Amass intel to get the company ASN number and more root domains
-- [x] Implement parallelism with ```parallel```
 - [ ] Include get-technologies.sh output in markdown
 - [ ] Implement uploading to imgur via their API
 - [ ] Integrate nuclei scanning
@@ -52,7 +63,6 @@
 - [ ] Also make the possibility to include ignore.txt file to ignore these new findings ( If We want to prevent them from appearing )
 - [ ] Make separate shodan script with API key
 - [ ] Make basic documentation with ```docsify```
-- [x] Make this script more colourful!
 - [ ] Jeez, just get ``` extracting-javascript.sh``` working!!! With ```scripthunter``` and ```jsmon```
 - [ ] Redirect unneceseary output to /dev/null in favor of ```-o``` flag whenever possible
 - [ ] Define out of scope addresses with the help of regex expressions (and grex to generate them)
@@ -65,3 +75,7 @@
 - [ ] Use EyeWitness
 - [ ] After some long time, let's replace markdown with ```rmarkdown```, add sweet charts, visualizations :)
 - [ ] Integrate ```bbrf```
+  - [X] Make bbrf-server communicate with bug-bounty-framework-web container
+  - [X] include `bbrf url add -` in getting subdomains at the end of the script
+  - [ ] Abandon the use of subdomain files and rely only on `bbrf urls` command. Make use of bbrf tags.
+- [ ] Experiment with Obsidian plugin creation, etc. :)
