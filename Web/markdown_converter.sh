@@ -73,7 +73,7 @@ while read -r domain; do
 
 
 	{
-	 echo "# ${domain}"
+	 echo "# [${domain}](${domain})"
 	 wget -qO- "https://raw.githubusercontent.com/Cloufish/Bug-bounty/master/bugbounty_checklist.md"
 	 } >> "${markdown_dir}"/"${domain}"_report.mdpp
 
@@ -81,7 +81,7 @@ while read -r domain; do
 	 echo "## ALIVE SUBDOMAINS" >> "${markdown_dir}"/"${domain}"_report.mdpp
 	 echo "!INCLUDE \"${markdown_dir}/${domain}_subdomains.mdpp\"" >> "${markdown_dir}"/"${domain}"_report.mdpp
 	 } >> "${markdown_dir}"/"${domain}"_report.mdpp
-
+	 # BEGIN OF LISTING ALIVE_SUBDOMAINS
 	 while read -r alive_subdomain; do
 
 		 alive_subdomain_folder_name=$(echo "${alive_subdomain}" | tr / _) # Because in creation of directories, the '/' letter is not escaped we need to cut out only domain.com and get rid of 'https://''
@@ -93,7 +93,7 @@ while read -r domain; do
 		 touch "${markdown_dir}"/alive_"${alive_subdomain_folder_name}"/report_"${alive_subdomain_folder_name}".mdpp
 
 		 {
-		 echo "### ${alive_subdomain}"
+		 echo "### [${alive_subdomain}](${alive_subdomain})"
 		 echo "### NOTES" >> "${markdown_dir}"/alive_"${alive_subdomain_folder_name}"/report_"${alive_subdomain_folder_name}".mdpp
 		 echo "!INCLUDE \"${markdown_dir}/alive_${alive_subdomain_folder_name}/notes.mdpp\"" >> "${markdown_dir}"/alive_"${alive_subdomain_folder_name}"/report_"${alive_subdomain_folder_name}".mdpp
 	 } >> "${markdown_dir}"/alive_"${alive_subdomain_folder_name}"/report_"${alive_subdomain_folder_name}".mdpp

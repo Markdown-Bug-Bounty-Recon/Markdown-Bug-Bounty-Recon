@@ -55,13 +55,3 @@ do
     bbrf inscope add "${domain_of_of_scope}"
 done < ./"${domain}"/out-of-scope.txt
 
-
-#Removing 'http://www.' prefixes and replacing them with "*." for the grex
-#< ./"${domain}"/scope.txt grep http | cut -d . -f 2- | awk '{print "*."$0}'
-#< ./"${domain}"/out-of-scope.txt grep http | cut -d . -f 2- | awk '{print "*."$0}'
-
-grex -f ./"${domain}"/scope.txt > ./"${domain}"/scope.regx 2>/dev/null
-
-grex -f ./"${domain}"/out-of-scope.txt > ./"${domain}"/out-of-scope.regx 2>/dev/null
-
-
