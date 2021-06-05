@@ -55,6 +55,10 @@ done
  fi
 
 
+bbrf new "$(echo "${domain}" | cut -f 1 -d .)"
+bbrf use "$(echo "${domain}" | cut -f 1 -d .)"
+
+
 CURRENTDATE=$(date +"%Y-%m-%d")
 echo "$CURRENTDATE" > "$PWD"/"${domain}"/last-init-date.txt
 mkdir -p "${domain}"/"${CURRENTDATE}"/"$domain"/tools-io

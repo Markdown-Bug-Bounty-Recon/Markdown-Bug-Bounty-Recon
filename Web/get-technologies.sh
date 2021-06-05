@@ -58,4 +58,10 @@ done
 
 	https_link=$(echo "${domain}" | httprobe | head -n 1)
 	node "/home/${USER_EXEC}/tools/wappalyzer/src/drivers/npm/cli.js" "$https_link" -P | jq '.technologies[].name' | tee "$bin"/"${domain}"_technologies.txt
+	
+	whatwaf -u "${https_link}" -F -C -o "$bin"/"${domain}"_whatwaf.csv
+	csv2md < "$bin"/"${domain}"_whatwaf.csv > "$bin"/"${domain}"_whatwaf.md
+	rm "$bin"/"${domain}"_whatwaf.csv
+
+
 done < "${PWD}"/"${domain}"/roots.txt

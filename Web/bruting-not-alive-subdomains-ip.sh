@@ -49,8 +49,11 @@ done
    exit
  fi
 
+bbrf use "$(echo "${domain}" | cut -f 1 -d .)"
+
  LAST_INIT_DATE=$(cat "$PWD"/"${domain}"/last-init-date.txt)
 while read -r domain; do
+
 
 	mkdir -p "${domain}"/"${LAST_INIT_DATE}"/"$domain"/tools-io
 	dir=$PWD/${domain}/${LAST_INIT_DATE}/"$domain"
