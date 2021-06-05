@@ -91,7 +91,7 @@ while read -r domain; do
 
 
 ## Adding not alive domains to bbrf
-"$bin"/"${domain}"_subdomains.txt bbrf url add - -t type:not-alive -t from:framework-script -t date:"$(date +"%Y-%m-%d")"
+"$bin"/"${domain}"_subdomains.txt bbrf domain add - -t type:not-alive -t from:framework-script -t date:"$(date +"%Y-%m-%d")"
 
  ## Adding alive domains to bbrf
  <"$bin"/"${domain}"_alive_subdomains.txt bbrf url add - -t type:alive -t from:framework-script -t date:"$(date +"%Y-%m-%d")"
