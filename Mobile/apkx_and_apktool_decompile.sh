@@ -8,7 +8,7 @@ usage(){
 
 }
 
-while getopts p OPTION; do
+while getopts p: OPTION; do
 	case $OPTION in
 		p)
 		package_name="$OPTARG"
@@ -19,8 +19,7 @@ while getopts p OPTION; do
 	esac
 done
 
-name_without_ext=$( "$package_name" | cut -d . -f 1)
-mkdir "${name_without_ext}"_apktool
+name_without_ext=$( echo "$package_name" | cut -d . -f 1)
 mkdir "${name_without_ext}"_apkx
 
 apktool d "${package_name}" -o "${name_without_ext}"_apktool
