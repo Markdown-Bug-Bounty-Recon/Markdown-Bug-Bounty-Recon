@@ -1,5 +1,4 @@
-#!/bin/bash
-
+#!/bin/bash -x
 usage(){
 
 	echo "Usage: $0 -p [.APK name]" >&2
@@ -19,11 +18,22 @@ while getopts p: OPTION; do
 	esac
 done
 
-name_without_ext=$( echo "$package_name" | cut -d . -f 1)
-mkdir "${name_without_ext}"_apkx
 
-apktool d "${package_name}" -o "${name_without_ext}"_apktool
+name_without_ext=$( echo "${package_name}" | cut -d . -f 1)
+location_of_the_apk=$("$PWD"/"$package_name")
 
-cd "${name_without_ext}"_apkx || exit
-apkx ../"${package_name}"
+if ! [ -d "$package_name" ]; then
+mkdir "${package_name}"
+fi
+
+cd "${package_name}" || exit
+
+mkdir "${name_without_ext}"_java
+cd "${name_without_ext}"_java || exit
+apkx "$location_of_the_apk"/"${package_name}"
+cd ..
+
+apktool d "$location_of_the_apk"/"${package_name}" -o "${name_without_ext}"_smali
+
+
 
