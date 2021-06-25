@@ -20,20 +20,20 @@ done
 
 
 name_without_ext=$( echo "${package_name}" | cut -d . -f 1)
-location_of_the_apk=$("$PWD"/"$package_name")
+location_of_the_apk="$PWD"/"${package_name}"
 
-if ! [ -d "$package_name" ]; then
-mkdir "${package_name}"
+if ! [ -d "$name_without_ext" ]; then
+mkdir "${name_without_ext}"
 fi
 
-cd "${package_name}" || exit
+cd "${name_without_ext}" || exit
 
 mkdir "${name_without_ext}"_java
 cd "${name_without_ext}"_java || exit
-apkx "$location_of_the_apk"/"${package_name}"
+apkx "$location_of_the_apk"
 cd ..
 
-apktool d "$location_of_the_apk"/"${package_name}" -o "${name_without_ext}"_smali
+apktool d "$location_of_the_apk" -o "${name_without_ext}"_smali
 
 
 

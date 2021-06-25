@@ -15,6 +15,7 @@ adb root
 
 adb push "${PWD}"/"${name_of_the_frida_server}" /data/local/frida
 
-adb shell su /data/local/frida &
+adb shell chmod +x /data/local/frida
+adb shell /data/local/frida &
 
 rm "${name_of_the_frida_server}"
