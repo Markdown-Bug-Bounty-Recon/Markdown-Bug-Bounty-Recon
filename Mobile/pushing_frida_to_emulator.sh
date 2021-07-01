@@ -1,6 +1,6 @@
 #!/bin/bash -x
 
-
+# FRIDA
 newest_frida_version=$(frida --version)
 phone_architecture=$(adb shell getprop ro.product.cpu.abi)
 
@@ -19,3 +19,6 @@ adb shell chmod +x /data/local/frida
 adb shell /data/local/frida &
 
 rm "${name_of_the_frida_server}"
+
+# DROZER
+## Won't be achieved, because of incosistency in Drozer version vs Drozer Agent Version
