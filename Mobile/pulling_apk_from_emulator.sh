@@ -24,7 +24,7 @@ package_name=$(adb shell pm list packages | grep "$package_name_fragment" | cut 
 
 package_path=$(adb shell pm path "${package_name}" | cut -d : -f 2)
 
-package_name=$(echo "${package_name}" | tr . _ ) 
+package_name=$(echo "${package_name}" | tr . _ ).apk
 
 
-adb pull "${package_path}" "${package_name}".apk
+adb pull "${package_path}" "${package_name}"
