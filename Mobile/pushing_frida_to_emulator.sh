@@ -13,6 +13,8 @@ name_of_the_frida_server=frida-server-"${newest_frida_version}"-android-"${phone
 
 adb root
 
+adb shell rm data/local/frida
+
 adb push "${PWD}"/"${name_of_the_frida_server}" /data/local/frida
 
 adb shell chmod +x /data/local/frida
