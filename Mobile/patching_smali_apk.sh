@@ -26,13 +26,12 @@ done
 
 apktool b "$apktool_dir" -o "$apktool_dir".apk
 patchedUnSigned_apk="$apktool_dir".apk
-package_name_fragment="$apktool_dir"
+#package_name_fragment="$apktool_dir"
 
 signing_apk.sh -p "$patchedUnSigned_apk" -k "$key" 
 
 ## Getting the name of the app to uninstall
-package_name=$(adb shell pm list packages | grep "$package_name_fragment" | cut -d : -f 2)
+#package_name=$(adb shell pm list packages | grep "$package_name_fragment" | cut -d : -f 2)
 
-adb uninstall "$package_name"
-
-adb install "$apktool_dir"patchedSignedApp.apk
+#adb uninstall "$package_name"
+#adb install "$apktool_dir"patchedSignedApp.apk
