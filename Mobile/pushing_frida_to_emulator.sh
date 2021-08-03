@@ -25,3 +25,7 @@ rm "${name_of_the_frida_server}"
 
 # DROZER
 ## Won't be achieved, because of incosistency in Drozer version vs Drozer Agent Version
+
+wget https://github.com/FSecureLABS/drozer/releases/download/2.3.4/drozer-agent-2.3.4.apk
+drozer_agent=$(ls ./*drozer*)
+adb install "${drozer_agent}"
