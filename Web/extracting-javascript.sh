@@ -60,16 +60,19 @@ while read -r domain; do
 	bin=$dir/tools-io
 
 	while read -r alive_subdomain; do
-		alive_subdomain_folder_name=$(echo "${alive_subdomain}" | tr / _ ) # Because in creation of directories, the '/' letter is not escaped we need to cut out only domain.com and get rid of 'https://''
+		alive_subdomain_folder_name=$(echo "${alive_subdomain}" | tr / _ ) # Because in creation of directories, the '/' letter is not escaped we need to cut out only domain.com (get rid of 'https://)''
 
 		mkdir "${dir}"/tools-io/alive_"${alive_subdomain_folder_name}"
 		bin="${dir}"/tools-io/alive_"${alive_subdomain_folder_name}"
 
+		
+		scripthunter.sh "${alive_subdomain}" -s 
+		
 		mkdir -p "${bin}"/javascript_work/scripts &
-		mkdir -p "${bin}"/javascript_work/endpoints &
-		mkdir -p "${bin}"/javascript_work/no-endpoints &
-		mkdir -p "${bin}"/javascript_work/output &
-		mkdir -p "${bin}"/javascript_work/script-links &
+		#mkdir -p "${bin}"/javascript_work/endpoints &
+		#mkdir -p "${bin}"/javascript_work/no-endpoints &
+		#mkdir -p "${bin}"/javascript_work/output &
+		#mkdir -p "${bin}"/javascript_work/script-links &
 
 
 		wait
