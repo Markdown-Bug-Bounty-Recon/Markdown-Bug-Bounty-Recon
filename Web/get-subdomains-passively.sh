@@ -72,7 +72,7 @@ while read -r domain; do
 
 
 	# Subdomain Scraping
-	bbrf scope in --wildcard --top | amass enum -passive -d "${domain}" -o "$bin"/"${domain}"_subdomains_amass.txt &
+	amass enum -passive -d "${domain}" -o "$bin"/"${domain}"_subdomains_amass.txt &
 	#subfinder -d "${domain}" -o "$bin"/"${domain}"_subdomains_subfinder.txt &
 	#curl "https://tls.bufferover.run/dns?q=.${domain}" 2>/dev/null | jq .Results | cut -d ',' -f 3 | tr -d '\"' | tr -d ']' | tr -d '[' | tee -a "$bin"/"${domain}"_subdomains_cloud.txt & # YES I KNOW THAT THESE 'TR' LOOK TERRIBLE, WILL CHANGE IT TO SED SOMEDAY OR GREP
 	wait

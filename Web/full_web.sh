@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -x
 
 usage(){
 
@@ -67,8 +67,8 @@ endCl="\033[0m\e[0m"
 echo -e "${redCl} INITIALIZATION.sh ${endCl}"
 initialization.sh -d "$domain" -a "$ASN" -u "$USER_EXEC"
 get-other-root-domains.sh -d "$domain" -u "$USER_EXEC" &
-echo -e "${greenCl} GET-TECHNOLOGIES.sh ${endCl}"
-get-technologies.sh -d "$domain" -u "$USER_EXEC"
+#echo -e "${greenCl} GET-TECHNOLOGIES.sh ${endCl}"
+#get-technologies.sh -d "$domain" -u "$USER_EXEC"
 echo -e "${yellowCl} GET-SUBDOMAINS-PASSIVELY.sh ${endCl}"
 get-subdomains-passively.sh -d "$domain" -u "$USER_EXEC"
 echo -e "${blueCl} GET-ALIVE-SUBDOMAINS.sh ${endCl}"
@@ -76,7 +76,7 @@ get-alive-subdomains.sh -d "$domain" -u "$USER_EXEC"
 echo -e "${magentCl} GET-NOT-ALIVE-SUBDOMAINS.sh ${endCl}"
 get-not-alive-subdomains-ip.sh -d "$domain" -u "$USER_EXEC"
 echo -e "${cyanCl} EXTRACTING-JAVASCRIPT.sh ${endCl}"
-# extracting-javascript.sh -d "$domain" -u "$USER_EXEC"
+extracting-javascript.sh -d "$domain" -u "$USER_EXEC"
 if [ $BRUTE -eq 1 ]; then
 	echo -e "${redCl} BRUTING-NOT-ALIVE-SUBDOMAINS.sh ${endCl}"
 	bruting-not-alive-subdomains-ip.sh -d "$domain" -u "$USER_EXEC"
