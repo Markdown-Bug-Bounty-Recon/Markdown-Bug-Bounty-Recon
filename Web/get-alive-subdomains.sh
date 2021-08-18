@@ -88,6 +88,8 @@ while read -r domain; do
 
  sort "$bin"/"${domain}"_alive_subdomains.txt | uniq | tee "$bin"/"${domain}"_tmp_alive_subdomains.txt && mv "$bin"/"${domain}"_tmp_alive_subdomains.txt "$bin"/"${domain}"_alive_subdomains.txt
 
+ # puredns bruting
+ 
 
 
 ## Adding not alive domains to bbrf

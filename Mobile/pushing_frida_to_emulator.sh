@@ -3,6 +3,7 @@
 # FRIDA
 newest_frida_version=$(frida --version)
 phone_architecture=$(adb shell getprop ro.product.cpu.abi)
+frida_path="/data/local/tmp"
 
 wget https://github.com/frida/frida/releases/download/"${newest_frida_version}"/frida-server-"${newest_frida_version}"-android-"${phone_architecture}".xz
 
@@ -14,12 +15,12 @@ name_of_the_frida_server=frida-server-"${newest_frida_version}"-android-"${phone
 adb root
 
 adb shell pkill frida
-adb shell rm data/local/frida
+adb shell rm "$frida_path"/frida
 
-adb push "${PWD}"/"${name_of_the_frida_server}" /data/local/frida
+adb push "${PWD}"/"${name_of_the_frida_server}" "$frida_path"/frida
 
-adb shell chmod +x /data/local/frida
-adb shell /data/local/frida &
+adb shell chmod +x "$frida_path"/frida
+adb shell "$frida_path"/frida &
 
 rm "${name_of_the_frida_server}"
 
