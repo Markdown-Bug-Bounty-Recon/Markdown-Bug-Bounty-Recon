@@ -28,7 +28,7 @@ fi
 
 
 
-bbrf use "$(echo "${domain}" | cut -f 1 -d .)"
+#bbrf use "$(echo "${domain}" | cut -f 1 -d .)"
 
 echo -n "# SPECIFY EACH OF THE SUBDOMAINS IN NEW LINES; ASTERISK (*) WILDCARDS ARE ALLOWED, BUT NOT REGEX; DO NOT USE HTTP/HTTPS EXTENSION FORMAT; WITH .COM | .PL | .DE AT THE END (THIS IS A MUST)" > ./"${domain}"/scope.txt
 echo "DECLARING SCOPE OF YOUR PROGRAM. YOU NEED TO DO THAT TO USE BBRF QUERYING"
@@ -44,14 +44,14 @@ read -r -e -p "Do you want to declare it? [Y/N]: " choice
 sed -i '1d' ./"${domain}"/scope.txt
 sed -i '1d' ./"${domain}"/out-of-scope.txt
 
-while read -r domain_in_scope 
-do
-    bbrf inscope add "${domain_in_scope}"
-done < ./"${domain}"/scope.txt
+#while read -r domain_in_scope 
+#do
+#    bbrf inscope add "${domain_in_scope}"
+#done < ./"${domain}"/scope.txt
 
 
-while read -r domain_of_of_scope 
-do
-    bbrf inscope add "${domain_of_of_scope}"
-done < ./"${domain}"/out-of-scope.txt
+#while read -r domain_of_of_scope 
+#do
+#    bbrf inscope add "${domain_of_of_scope}"
+#done < ./"${domain}"/out-of-scope.txt
 

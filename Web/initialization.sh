@@ -55,8 +55,8 @@ done
  fi
 
 
-bbrf new "$(echo "${domain}" | cut -f 1 -d .)"
-bbrf use "$(echo "${domain}" | cut -f 1 -d .)"
+
+#bbrf use "$(echo "${domain}" | cut -f 1 -d .)"
 
 
 CURRENTDATE=$(date +"%Y-%m-%d")

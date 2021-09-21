@@ -49,7 +49,7 @@ done
    exit
  fi
 
-bbrf use "$(echo "${domain}" | cut -f 1 -d .)"
+#bbrf use "$(echo "${domain}" | cut -f 1 -d .)"
 
  LAST_INIT_DATE=$(cat "$PWD"/"${domain}"/last-init-date.txt)
 while read -r domain; do

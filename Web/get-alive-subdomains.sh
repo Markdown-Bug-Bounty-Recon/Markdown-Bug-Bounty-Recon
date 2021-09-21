@@ -49,7 +49,7 @@ done
    exit
  fi
 
-bbrf use "$(echo "${domain}" | cut -f 1 -d .)"
+#bbrf use "$(echo "${domain}" | cut -f 1 -d .)"
 
  LAST_INIT_DATE=$(cat "$PWD"/"${domain}"/last-init-date.txt)
 while read -r domain; do
@@ -59,7 +59,8 @@ while read -r domain; do
 	bin=$dir/tools-io
 
 			# We do the same thing as in get-subdomains-passively.sh again, but this time with -active flag
-		bbrf scope in --wildcard --top | amass enum -active -d "${domain}" -o "$bin"/"${domain}"_subdomains_amass.txt 
+		#bbrf scope in --wildcard --top | 
+		amass enum -active -d "${domain}" -o "$bin"/"${domain}"_subdomains_amass.txt 
 		
 		cat "$bin"/"${domain}"_subdomains_amass.txt >> "$bin"/"${domain}"_subdomains.txt
 		rm "$bin"/"${domain}"_subdomains_amass.txt
@@ -91,9 +92,9 @@ while read -r domain; do
 
 
 ## Adding not alive domains to bbrf
-"$bin"/"${domain}"_subdomains.txt bbrf domain add - -t type:not-alive -t from:framework-script -t date:"$(date +"%Y-%m-%d")"
+#"$bin"/"${domain}"_subdomains.txt bbrf domain add - -t type:not-alive -t from:framework-script -t date:"$(date +"%Y-%m-%d")"
 
  ## Adding alive domains to bbrf
- <"$bin"/"${domain}"_alive_subdomains.txt bbrf url add - -t type:alive -t from:framework-script -t date:"$(date +"%Y-%m-%d")"
+# <"$bin"/"${domain}"_alive_subdomains.txt bbrf url add - -t type:alive -t from:framework-script -t date:"$(date +"%Y-%m-%d")"
 
 done < "${PWD}"/"${domain}"/roots.txt
