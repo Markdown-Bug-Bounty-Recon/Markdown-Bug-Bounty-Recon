@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash 
 
 while getopts d:a:u: OPTION; do
 	case $OPTION in
@@ -11,15 +11,15 @@ while getopts d:a:u: OPTION; do
 	esac
 done
 
-function yes_or_no {
-    while true; do
-        read -r "$* [y/n]: " yn
-        case $yn in
-            [Yy]*) return 0  ;;
-            [Nn]*) echo "Aborted" ; return  1 ;;
-        esac
-    done
-}
+#function yes_or_no {
+ #   while true; do
+  #      read -r "$* [y/n]: " yn
+   #     case $yn in
+    #        [Yy]*) return 0  ;;
+     #       [Nn]*) echo "Aborted" ; return  1 ;;
+     #   esac
+ #   done
+#}
 
 if [ "$EUID" -ne 0 ]
   then echo "Please run as root"
@@ -30,17 +30,34 @@ fi
 
 #bbrf use "$(echo "${domain}" | cut -f 1 -d .)"
 
-echo -n "# SPECIFY EACH OF THE SUBDOMAINS IN NEW LINES; ASTERISK (*) WILDCARDS ARE ALLOWED, BUT NOT REGEX; DO NOT USE HTTP/HTTPS EXTENSION FORMAT; WITH .COM | .PL | .DE AT THE END (THIS IS A MUST)" > ./"${domain}"/scope.txt
-echo "DECLARING SCOPE OF YOUR PROGRAM. YOU NEED TO DO THAT TO USE BBRF QUERYING"
-read -r -e -p "Do you want to declare it? [Y/N]: " choice
-[[ "$choice" == [Yy]* ]] && vim ./"${domain}"/scope.txt || echo "that was a no"
 
-echo -n "# SPECIFY EACH OF THE SUBDOMAINS IN NEW LINES; ASTERISK (*) WILDCARDS ARE ALLOWED, BUT NOT REGEX; DO NOT USE HTTP/HTTPS EXTENSION FORMAT; WITH .COM | .PL | .DE AT THE END (THIS IS A MUST)" > ./"${domain}"/out-of-scope.txt
-echo "DECLARING OUT OF SCOPE OF YOUR PROGRAM"
-read -r -e -p "Do you want to declare it? [Y/N]: " choice
-[[ "$choice" == [Yy]* ]] && vim ./"${domain}"/out-of-scope.txt || echo "that was a no"
 
-# Removing the comment in these files:
+
+FILE=./"${domain}"/scope.txt
+if ! [ -f "$FILE" ]; then
+    echo -n "# SPECIFY EACH OF THE SUBDOMAINS IN NEW LINES; ASTERISK (*) WILDCARDS ARE ALLOWED, BUT NOT REGEX; DO NOT USE HTTP/HTTPS EXTENSION FORMAT; WITH .COM | .PL | .DE AT THE END (THIS IS A MUST)" > ./"${domain}"/scope.txt
+    echo "DECLARING SCOPE OF YOUR PROGRAM. YOU NEED TO DO THAT TO USE BBRF QUERYING"
+    select yn in "Yes" "No"; do
+        case $yn in
+            Yes ) nvim ./"${domain}"/scope.txt; break;;
+            No ) echo "that was a no" && touch ./"${domain}"/scope.txt; break;;
+        esac
+    done
+fi 
+
+FILE=./"${domain}"/out-of-scope.txt
+if ! [ -f "$FILE" ]; then
+    echo -n "# SPECIFY EACH OF THE SUBDOMAINS IN NEW LINES; ASTERISK (*) WILDCARDS ARE ALLOWED, BUT NOT REGEX; DO NOT USE HTTP/HTTPS EXTENSION FORMAT; WITH .COM | .PL | .DE AT THE END (THIS IS A MUST)" > ./"${domain}"/scope.txt
+    echo "DECLARING OUT-OF-SCOPE OF YOUR PROGRAM. YOU NEED TO DO THAT TO USE BBRF QUERYING"
+    select yn in "Yes" "No"; do
+        case $yn in
+            Yes ) nvim ./"${domain}"/out-of-scope.txt; break;;
+            No ) echo "that was a no" && touch ./"${domain}"/out-of-scope.txt; break;;
+        esac
+    done
+fi 
+
+# Removing the comment in these files (removing the first line):
 sed -i '1d' ./"${domain}"/scope.txt
 sed -i '1d' ./"${domain}"/out-of-scope.txt
 

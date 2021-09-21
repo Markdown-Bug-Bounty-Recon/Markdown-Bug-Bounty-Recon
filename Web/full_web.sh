@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -x
 
 usage(){
 
@@ -6,7 +6,8 @@ usage(){
 	echo ' -d DOMAIN Specify your domain with address in format without protocol (e.g "chosen_domain.com")'
 	echo ' -a ASN Number: Go to the site https://bgp.he.net/ and search for company that you are up to and enter their ASN number without "AS" prefix prefix [YOU NEED TO FIND THE VALID ASN NUMBER that has a IPv4 ranges connected to them!'
 	echo ' Furthermore, please fill in the Acquisitions.txt file in order to scan Acquisitions too!'
-	echo ' -b - BRUTE FORCE - The script will brute-force domains that it has found - Do it with caution. '
+	echo ' -q - BRUTE FORCE - The script will brute-force domains that it has found - Do it with caution. '
+	echo ' -u - NON-ROOT USER "CONTEXT" - This is necessary for the output to be stored in your non-root user home directory, DEFAULT = root '
 		exit 1
 
 }
@@ -25,7 +26,7 @@ usage(){
 #	esac
 #done
 
-while getopts d:a:u:s OPTION; do
+while getopts d:a:u:q OPTION; do
 	case $OPTION in
 		d)
 		domain="$OPTARG"
@@ -36,8 +37,8 @@ while getopts d:a:u:s OPTION; do
 		u)
 		USER_EXEC="$OPTARG"
 		;;
-		s)
-		BRUTE=1
+		q)
+		BRUTE=0
 		;;
 		?)
 		usage
@@ -66,8 +67,8 @@ endCl="\033[0m\e[0m"
 echo -e "${redCl} INITIALIZATION.sh ${endCl}"
 initialization.sh -d "$domain" -a "$ASN" -u "$USER_EXEC"
 get-other-root-domains.sh -d "$domain" -u "$USER_EXEC" &
-echo -e "${greenCl} GET-TECHNOLOGIES.sh ${endCl}"
-get-technologies.sh -d "$domain" -u "$USER_EXEC"
+#echo -e "${greenCl} GET-TECHNOLOGIES.sh ${endCl}"
+#get-technologies.sh -d "$domain" -u "$USER_EXEC"
 echo -e "${yellowCl} GET-SUBDOMAINS-PASSIVELY.sh ${endCl}"
 get-subdomains-passively.sh -d "$domain" -u "$USER_EXEC"
 echo -e "${blueCl} GET-ALIVE-SUBDOMAINS.sh ${endCl}"
@@ -75,7 +76,7 @@ get-alive-subdomains.sh -d "$domain" -u "$USER_EXEC"
 echo -e "${magentCl} GET-NOT-ALIVE-SUBDOMAINS.sh ${endCl}"
 get-not-alive-subdomains-ip.sh -d "$domain" -u "$USER_EXEC"
 echo -e "${cyanCl} EXTRACTING-JAVASCRIPT.sh ${endCl}"
-# extracting-javascript.sh -d "$domain" -u "$USER_EXEC"
+extracting-javascript.sh -d "$domain" -u "$USER_EXEC"
 if [ $BRUTE -eq 1 ]; then
 	echo -e "${redCl} BRUTING-NOT-ALIVE-SUBDOMAINS.sh ${endCl}"
 	bruting-not-alive-subdomains-ip.sh -d "$domain" -u "$USER_EXEC"

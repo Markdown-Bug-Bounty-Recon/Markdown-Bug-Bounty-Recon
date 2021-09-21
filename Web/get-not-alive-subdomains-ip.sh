@@ -66,8 +66,8 @@ while read -r domain; do
 	if [ -f "/home/${USER_EXEC}/lists/resolvers.txt*" ]; then
 	 echo "resolvers.txt file exists"
 	else
-	 mkdir "/home/${USER_EXEC}/lists/"
-	 wget https://raw.githubusercontent.com/blechschmidt/massdns/master/lists/resolvers.txt -O "/home/${USER_EXEC}/lists/resolvers.txt"
+	 mkdir -p "/home/${USER_EXEC}/wordlists/Resolvers"
+	 wget https://raw.githubusercontent.com/blechschmidt/massdns/master/lists/resolvers.txt -O "/home/${USER_EXEC}/wordlists/Resolvers/resolvers.txt"
 	fi
 
 	massdns --resolvers /home/"${USER_EXEC}"/lists/resolvers.txt --drop-user ${USER_EXEC} --drop-group ${USER_EXEC} -t AAAA "$bin"/"${domain}"_subdomains.txt -o J -w "${bin}"/"${domain}"_dns-resolved-ip.json

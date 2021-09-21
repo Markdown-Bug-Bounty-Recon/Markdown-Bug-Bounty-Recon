@@ -27,8 +27,8 @@ done
 
 #keytool -genkey -alias myDomain -keyalg RSA -keysize 2048 -validity 7300 -keystore myKeyStore.jks -storepass myStrongPassword
 
-name_of_the_app=$(echo "$apk_package" | cut -d . -f 1)
+name_of_the_app=$(echo "$apk_UnSignedPackage" | cut -d . -f 1)
 
-apksigner sign --out "${name_of_the_app}"patchedSignedApp.apk --ks "$key" "$apk_UnSignedPackage"
+apksigner sign --out "${name_of_the_app}"patchedSignedApp.apk --ks "$key" "$apk_UnSignedPackage" --key-pass myStrongPassword
 
-jarsigner -keystore "$apk_package"
+jarsigner -keystore "$apk_UnSignedPackage"
